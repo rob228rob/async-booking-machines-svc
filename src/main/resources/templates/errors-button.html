@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Бронирование стиральных машинок</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat+Alternates:wght@400;700&family=Roboto:wght@400;500&family=Montserrat:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            background-color: #f9f9f9;
+            display: flex;
+            flex-direction: column;
+        }
+        .header {
+            background-color: #333;
+            width: 100%;
+            height: 40px; 
+            padding: 30px;
+            font-size: 28px;
+            color: #4CAF50;
+            font-family: 'Montserrat Alternates', sans-serif;
+            font-weight: 700;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 1;
+            box-sizing: border-box;
+        }
+        .header .links {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .header .links a {
+            text-decoration: none;
+            font-size: 16px;
+            color: white;
+            padding: 8px 15px;
+            border: 2px solid #4CAF50;
+            border-radius: 20px;
+            transition: background-color 0.3s ease, color 0.3s ease;
+            white-space: nowrap;
+        }
+        .header .links a:hover {
+            background-color: #4CAF50;
+            color: white;
+        }
+        .content {
+            flex: auto;
+            padding-top: 120px; 
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+        }
+        .footer {
+            width: 100%;
+            background-color: #333;
+            padding: 10px 0;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+        }
+        .footer a {
+            text-decoration: none;
+            color: #4CAF50;
+            font-size: 16px;
+            padding: 8px 15px;
+            border: 2px solid #4CAF50;
+            border-radius: 20px;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+        .footer a:hover {
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        /* Стили для формы обратной связи */
+        .error-report-form {
+            width: 100%;
+            max-width: 600px;
+            padding: 20px;
+            box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.1);
+            background-color: #fff;
+            border-radius: 8px;
+            box-sizing: border-box;
+            font-family: 'Montserrat', sans-serif; 
+        }
+
+        .error-report-form select {
+            width: 100%;
+            padding: 10px;
+            margin-top: 10px;
+            margin-bottom: 20px;
+            font-size: 16px;
+            font-family: 'Montserrat', sans-serif; 
+        }
+
+        .error-report-form textarea {
+            width: 100%;
+            height: 150px;
+            padding: 10px;
+            font-size: 16px;
+            font-family: 'Montserrat', sans-serif;
+            margin-bottom: 20px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            resize: none; 
+            box-sizing: border-box;
+        }
+
+        .error-report-form button {
+            padding: 10px 20px;
+            font-size: 16px;
+            font-family: 'Montserrat', sans-serif;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            font-family: 'Montserrat', sans-serif; 
+        }
+
+        .error-report-form button:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+<div class="header">
+    <div class="title">
+        правовая поддержка
+    </div>
+    <div class="links">
+        <a href="/home">Главная</a>
+        <a href="/profile">Профиль</a>
+        <a href="/achievements">Мои достижения</a>
+    </div>
+</div>
+
+<div class="content">
+    <form id="errorReportForm" class="error-report-form" onsubmit="return validateForm()">
+        <p>Благодарим Вас за желание улучшить наш продукт!</p> 
+        <p>Пожалуйста, выберите интересующую Вас категорию:</p>
+
+        <select name="category" id="category">
+            <option value="">Выберите категорию</option>
+            <option value="technical">Технические правки</option>
+            <option value="text">Текстовые правки</option>
+        </select>
+
+        <textarea id="problemDescription" placeholder="Опишите проблему..."></textarea>
+
+        <button type="submit">Отправить</button>
+    </form>
+</div>
+
+<div class="footer">
+    <footer>
+        <span style="color: #4CAF50;">©️ Бронирование стиральных машинок 2024</span>
+    </footer>
+    <a href="/report-issue"><b>Обратная связь</b></a>
+</div>
+
+
+<script>
+    function validateForm() {
+        const category = document.getElementById("category").value;
+        const description = document.getElementById("problemDescription").value;
+
+        if (category === "") {
+            alert("Пожалуйста, выберите категорию.");
+            return false;
+        }
+
+        if (description.trim() === "") {
+            alert("Пожалуйста, опишите проблему.");
+            return false;
+        }
+
+        return true; // Если проверка пройдена, форма отправляется
+    }
+</script>
+</body>
+</html>

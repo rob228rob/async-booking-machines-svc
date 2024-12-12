@@ -1,0 +1,48 @@
+application:
+  version: 1.0
+  name: "CW DB"
+  description: ""
+
+  admin-data:
+    email: ${ADMIN_ACCOUNT_EMAIL:admin@gmail.com}
+    password: ${ADMIN_ACCOUNT_PSSWD:qweqweqwe}
+
+
+spring:
+  application:
+    name: lawyer-helper
+
+  jpa:
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+        use_sql_comments: true
+    show-sql: false
+
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5432/main_db
+    username: ${DB_USERNAME:postgres}
+    password: ${DB_PW:postgres}
+
+  batch:
+    jdbc:
+      initialize-schema: always
+
+  liquibase:
+    enabled: true
+    change-log: classpath:db/changelog/db.changelog-master.yaml
+
+server:
+  port: 8081
+
+logging:
+  level:
+    org:
+      springframework:
+        orm.jpa.JpaTransactionManager: DEBUG
+      hibernate:
+        tool.hbm2ddl: DEBUG
+        SQL: DEBUG
+        type.descriptor.sql.BasicBinder: TRACE

@@ -1,0 +1,492 @@
+
+body {
+    font-family: 'Arial', sans-serif;
+    margin: 0;
+    padding: 0;
+    height: 100vh;
+    background-color: #f9f9f9;
+    display: flex;
+    flex-direction: column;
+}
+.header {
+    background-color: #333;
+    width: 100%;
+    height: auto;
+    padding: 20px;
+    font-size: 28px;
+    color: #4CAF50;
+    font-family: 'Montserrat Alternates', sans-serif;
+    font-weight: 700;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 1;
+    box-sizing: border-box;
+}
+.header .links {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-top: 10px;
+}
+.header .links a.logout {
+    background-color: darkgreen;
+    color: white;
+}
+
+.header .links a.logout:hover {
+    background-color: #007BFF;
+    color: white;
+}
+.header .links a {
+    text-decoration: none;
+    font-size: 16px;
+    color: white;
+    padding: 8px 15px;
+    border: 2px solid #4CAF50;
+    border-radius: 20px;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+.header .links a:hover {
+    background-color: #4CAF50;
+    color: white;
+}
+.correct-answer {
+    background-color: #d4edda; /* Светло-зелёный фон */
+    border-left: 5px solid #28a745; /* Зелёная полоса слева */
+}
+/* Добавим стили для таблицы бронирований */
+.reservations-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+.reservations-table th, .reservations-table td {
+    border: 1px solid #ddd;
+    padding: 12px;
+    text-align: center;
+}
+.reservations-table th {
+    background-color: #4CAF50;
+    color: white;
+}
+.no-reservations {
+    text-align: center;
+    color: #777;
+    margin-top: 20px;
+}
+
+.modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.5); justify-content: center; align-items: center; }
+.modal-content { background-color: #fff; padding: 20px; border-radius: 8px; max-width: 500px; width: 100%; }
+.rating-select { display: flex; gap: 10px; }
+.rating-select button { padding: 5px 10px; }
+.content {
+    flex: auto;
+    padding-top: 120px; /* Учитываем фиксированную высоту шапки */
+    padding-bottom: 120px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+.user-info {
+    background-color: white;
+    border: 4px solid #4CAF50;
+    border-radius: 10px;
+    padding: 20px;
+    width: 400px;
+    text-align: center;
+    margin-bottom: 30px;
+}
+.user-info h2 {
+    margin: 0;
+    font-size: 26px;
+    color: #333;
+}
+.user-info p {
+    margin: 10px 0;
+    font-size: 18px;
+    color: #555;
+}
+.course-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 20px;
+}
+.header .links a.active {
+    border-color: white;
+    background-color: #4CAF50;
+    color: white;
+}
+/* Стили для заголовка таблицы */
+.table-title {
+    font-size: 24px;
+    color: #333;
+    margin-bottom: 20px;
+    text-align: center;
+}
+.new-question-button {
+    padding: 10px 20px;
+    font-size: 16px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 20px;
+    transition: background-color 0.3s;
+}
+.new-question-button:hover {
+    background-color: #45a049;
+}
+
+/* Стиль для сообщений о пустом списке */
+.empty-message {
+    text-align: center;
+    font-size: 18px;
+    color: #555;
+    margin: 20px 0;
+}
+
+/* Все существующие стили остаются */
+
+/* Стиль для кнопки открытия модального окна */
+.new-question-button {
+    padding: 10px 20px;
+    font-size: 16px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 20px;
+    transition: background-color 0.3s;
+}
+
+/* Стиль для модального окна */
+.modal {
+    display: none; /* По умолчанию скрыто */
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    justify-content: center;
+    align-items: center;
+}
+
+.modal-content {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 5px;
+    width: 300px;
+    text-align: center;
+}
+
+.modal-content input[type="text"],
+.modal-content textarea {
+    width: 100%;
+    padding: 8px;
+    margin: 10px 0;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+}
+
+.modal-content button {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.submit-button {
+    background-color: #4CAF50;
+    color: white;
+}
+
+.close-button {
+    background-color: #d9534f;
+    color: white;
+}
+.ranking-info p {
+    font-size: 18px;
+    font-weight: 500;
+    color: #333;
+}
+/* Анимация flip */
+@keyframes flipIn {
+    from {
+        transform: rotateX(90deg);
+        opacity: 0;
+    }
+    to {
+        transform: rotateX(0);
+        opacity: 1;
+    }
+}
+.delete-button {
+    background-color: #f44336;
+    color: white;
+    border: none;
+    padding: 6px 10px;
+    cursor: pointer;
+    border-radius: 4px;
+}
+.delete-button:hover {
+    background-color: #d32f2f;
+}
+.message {
+    margin-top: 10px;
+    padding: 10px;
+    border-radius: 4px;
+    display: none;
+}
+.message.success {
+    background-color: #d4edda;
+    color: #155724;
+}
+.message.error {
+    background-color: #f8d7da;
+    color: #721c24;
+}
+.footer {
+    width: 100%;
+    background-color: #333;
+    padding: 10px 0;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 15px;
+}
+.footer a {
+    text-decoration: none;
+    color: #4CAF50;
+    font-size: 16px;
+    padding: 8px 15px;
+    border: 2px solid #4CAF50;
+    border-radius: 20px;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+.footer a:hover {
+    background-color: #4CAF50;
+    color: white;
+}
+.table-title {
+    font-size: 24px;
+    color: #333;
+    text-align: center;
+    margin-bottom: 20px;
+}
+/* Стили для кнопок "Удалить" и "Просмотреть ответы" */
+.delete-button, .view-answer-button {
+    padding: 6px 12px;
+    font-size: 14px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-right: 5px;
+    transition: background-color 0.3s;
+}
+
+.delete-button {
+    background-color: #e74c3c; /* Красный фон */
+    color: white;
+}
+
+.delete-button:hover {
+    background-color: #c0392b; /* Темно-красный при наведении */
+}
+
+.view-answer-button {
+    background-color: #5bc0de;
+    color: white;
+}
+
+.view-answer-button:hover {
+    background-color: #31b0d5;
+}
+.rate-lawyer-button {
+    background-color: #f39c12; /* Оранжевый цвет для кнопки оценки */
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    margin-left: 5px; /* Отступ от других кнопок */
+}
+
+.rate-lawyer-button:hover {
+    background-color: #e67e22; /* Более темный оранжевый цвет при наведении */
+}
+
+.question-table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: white;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+    overflow: hidden;
+}
+.modal {
+    display: none; /* Скрыто по умолчанию */
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
+.modal-content {
+    background-color: #fefefe;
+    margin: 15% auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%;
+    max-width: 500px;
+}
+
+.question-table th, .question-table td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+.question-table th {
+    background-color: #4CAF50;
+    color: white;
+}
+.question-table tr:last-child td {
+    border-bottom: none;
+}
+.button {
+    padding: 8px 12px;
+    border: none;
+    border-radius: 5px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+.delete-button {
+    background-color: #e74c3c;
+    color: white;
+}
+.delete-button:hover {
+    background-color: #c0392b;
+}
+.answer-button {
+    background-color: #4CAF50;
+    color: white;
+}
+.answer-button:hover {
+    background-color: #388e3c;
+}
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    justify-content: center;
+    align-items: center;
+}
+.modal-content {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    max-width: 500px;
+    width: 100%;
+}
+.rating-select button {
+    padding: 8px 12px;
+    margin: 5px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+/* Стили для кнопок "Удалить" и "Посмотреть ответ" */
+.delete-button, .view-answer-button {
+    padding: 6px 12px;
+    font-size: 14px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-right: 5px;
+    transition: background-color 0.3s;
+}
+
+.delete-button {
+    background-color: #d9534f;
+    color: white;
+}
+
+.delete-button:hover {
+    background-color: #c9302c;
+}
+
+.view-answer-button {
+    background-color: #5bc0de;
+    color: white;
+}
+
+.view-answer-button:hover {
+    background-color: #31b0d5;
+}
+.lawyer-rating {
+    margin-top: 10px;
+    padding: 10px;
+    background-color: #f0f8ff; /* Светлый фон */
+    border: 1px solid #add8e6; /* Голубая граница */
+    border-radius: 5px;
+}
+
+.lawyer-rating p {
+    margin: 5px 0;
+    font-size: 14px;
+    color: #333;
+}
+
+.lawyer-rating strong {
+    color: #4CAF50; /* Цвет выделения для заголовков */
+}
+
+/* Стили для ответов */
+.answers-section {
+    margin-top: 15px;
+    padding-left: 20px;
+    border-left: 2px solid #4CAF50;
+    display: none; /* Скрыто по умолчанию */
+}
+
+.answer {
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    padding: 10px;
+    margin-bottom: 10px;
+}
+
+.answer .lawyer-info {
+    font-size: 14px;
+    color: #4CAF50;
+    margin-bottom: 5px;
+}
+
+.answer .creation-date {
+    font-size: 12px;
+    color: #999;
+    text-align: right;
+}

@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Профиль пользователя</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat+Alternates:wght@400;700&family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/profile.css">
+</head>
+<body>
+<div class="header">
+    <div class="title">Бронирование стиральных машинок</div>
+    <div class="links">
+        <a href="/home">Главная</a>
+        <a href="/profile">Профиль</a>
+        <a href="/bookings">Бронирования</a>
+        <a href="/admin" id="admin-link">Админская панель</a>
+        <a href="/logout" class="logout">Выйти</a>
+    </div>
+</div>
+
+<div class="content">
+    <div class="user-info" id="user-info">
+        <!-- Информация о пользователе будет загружена сюда -->
+    </div>
+
+    <!-- Секция для отображения бронирований -->
+    <div class="reservations-container" id="reservations-container">
+        <h2>Ваши бронирования</h2>
+        <table class="reservations-table" id="reservations-table">
+            <thead>
+            <tr>
+                <th>ID Бронирования</th>
+                <th>Машинка</th>
+                <th>Общежитие</th>
+                <th>Временной слот</th>
+                <th>Статус</th>
+                <th>Действия</th> <!-- Новая колонка -->
+            </tr>
+            </thead>
+            <tbody id="reservations-body">
+            <!-- Бронирования будут динамически добавлены сюда -->
+            </tbody>
+        </table>
+        <div class="no-reservations" id="no-reservations" style="display: none;">
+            У вас пока нет бронирований.
+        </div>
+    </div>
+
+    <!-- Секция для отображения сообщений -->
+    <div class="message success" id="success-message">Действие выполнено успешно!</div>
+    <div class="message error" id="error-message">Произошла ошибка. Попробуйте снова.</div>
+</div>
+
+<div class="footer">
+    <footer>
+        <span style="color: #4CAF50;">©️ Бронирование стиральных машинок 2024</span>
+    </footer>
+    <a href="/report-issue"><b>Обратная связь</b></a>
+</div>
+
+<script type="text/javascript" src="/js/profile.js"></script>
+</body>
+</html>

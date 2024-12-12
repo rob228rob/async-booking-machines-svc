@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Бронирование стиральных машинок</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat+Alternates:wght@400;700&family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            background-color: #f9f9f9;
+            display: flex;
+            flex-direction: column;
+        }
+        .header {
+            background-color: #333;
+            width: 100%;
+            padding: 20px;
+            font-size: 28px;
+            color: #4CAF50;
+            font-family: 'Montserrat Alternates', sans-serif;
+            font-weight: 700;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 1;
+            box-sizing: border-box;
+        }
+        .header .links {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: center;
+            margin-top: 10px;
+        }
+        .header .links a {
+            text-decoration: none;
+            font-size: 16px;
+            color: white;
+            padding: 8px 15px;
+            border: 2px solid #4CAF50;
+            border-radius: 30px;
+            transition: background-color 0.3s ease, color 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .header .links a.login, .header .links a.logout {
+            background-color: darkgreen;
+            color: white;
+            border: none;
+        }
+        .header .links a.login:hover, .header .links a.logout:hover {
+            background-color: #2e7d32;
+            transform: translateY(-2px);
+        }
+        .content {
+            flex: 1;
+            padding-top: 80px; /* Увеличиваем отступ сверху для учета фиксированной шапки */
+            padding-bottom: 60px; /* Отступ снизу для футера */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .intro {
+            background-color: #fff;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 40px;
+            max-width: 800px;
+            width: 90%;
+        }
+
+        .intro h1 {
+            font-size: 36px;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .intro h1 .highlight {
+            font-family: 'Montserrat Alternates', sans-serif;
+            font-weight: 700;
+            color: #4CAF50;
+        }
+
+        .description {
+            margin-bottom: 40px;
+        }
+
+        .description h2 {
+            font-size: 28px;
+            color: #4CAF50;
+        }
+
+        .cta-section {
+            margin: 40px 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .cta-button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 15px 30px;
+            font-size: 18px;
+            text-decoration: none;
+            border-radius: 30px;
+            border: 3px solid darkslategrey;
+            transition: background-color 0.3s ease;
+        }
+
+        .cta-button:hover {
+            background-color: #388E3C;
+        }
+        .footer {
+            width: 100%;
+            background-color: #333;
+            padding: 10px 0;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+            box-sizing: border-box;
+        }
+        .footer a {
+            text-decoration: none;
+            color: #4CAF50;
+            font-size: 16px;
+            padding: 8px 15px;
+            border: 2px solid #4CAF50;
+            border-radius: 20px;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+        .footer footer {
+            color: white;
+            font-size: 16px;
+        }
+        .footer a:hover {
+            background-color: #4CAF50;
+            color: white;
+        }
+        .intro p {
+            font-size: 20px;
+            color: #555;
+        }
+    </style>
+</head>
+<body>
+<div class="header">
+    <div class="title">
+        Бронирование стиральных машинок
+    </div>
+    <div class="links">
+        <a href="/home">Главная</a>
+        <a href="/profile">Личный кабинет</a>
+        <a href="/bookings">Бронирования</a>
+        <a href="/login" class="login">Войти</a>
+    </div>
+</div>
+
+<div class="content">
+    <div class="intro">
+        <h1>Добро пожаловать на платформу <span class="highlight">бронирования стиральных машинок</span></h1>
+        <p>Здесь вы можете легко и удобно бронировать доступные стиральные и сушильные машины в вашем общежитии.</p>
+        <div class="cta-section">
+            <a href="/signup" class="cta-button">Зарегистрироваться</a>
+        </div>
+    </div>
+</div>
+
+<div class="footer">
+    <footer>
+        <span style="color: #4CAF50;">©️ 2024 Бронирование стиральных машинок</span>
+    </footer>
+    <a href="/report-issue"><b>Обратная связь</b></a>
+</div>
+
+<script>
+    async function checkLoginStatus() {
+        try {
+            const response = await fetch('/api/v1/user/get/current');
+            if (response.ok) {
+                // Пользователь авторизован, изменяем кнопку на "Выйти"
+                const user = await response.json();
+                document.querySelector('.login').textContent = 'Выйти';
+                document.querySelector('.login').href = '/logout';
+                // Дополнительно можно добавить обработчик выхода
+                document.querySelector('.login').addEventListener('click', (e) => {
+                    e.preventDefault();
+                    fetch('/logout', { method: 'POST' })
+                        .then(() => {
+                            window.location.href = '/home';
+                        })
+                        .catch(err => console.error('Ошибка при выходе:', err));
+                });
+            }
+        } catch (error) {
+            console.error('Ошибка проверки авторизации:', error);
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        checkLoginStatus(); // Проверяем статус авторизации
+    });
+</script>
+</body>
+</html>

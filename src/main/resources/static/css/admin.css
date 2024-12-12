@@ -1,0 +1,313 @@
+/* Global Styles */
+body {
+  font-family: 'Arial', sans-serif;
+  margin: 0;
+  padding:0;
+  height: 100%;
+  background-color: #f9f9f9;
+  display: flex;
+  flex-direction: column;
+}
+
+.header {
+  background-color: #333;
+  width: 100%;
+  height: auto; /* Шапка теперь будет иметь автоматическую высоту, адаптируясь под контент */
+  padding: 20px; /* Немного уменьшил отступы, чтобы они выглядели лучше на мобильных */
+  font-size: 28px;
+  color: #4CAF50;
+  font-family: 'Montserrat Alternates', sans-serif;
+  font-weight: 700;
+  display: flex;
+  flex-direction: column; /* На мобильных шапка и ссылки будут вертикально расположены */
+  justify-content: center;
+  align-items: center;
+  box-sizing: border-box;
+}
+
+.header .links {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap; /* Кнопки будут оборачиваться, если не поместятся в одну строку */
+  justify-content: center; /* Центрируем ссылки */
+  margin-top: 10px;
+}
+.header .links a.login {
+  background-color: #4CAF50; /* Цвет фона */
+  color: white; /* Цвет текста */
+  font-size: 18px; /* Размер шрифта */
+  padding: 12px 20px; /* Отступы */
+  border-radius: 30px; /* Округленные края */
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0); /* Тень */
+  transition: background-color 0.3s ease, color 0.3s ease, transform 0.3s ease; /* Плавный переход */
+  display: flex; /* Для выравнивания иконки и текста */
+  align-items: center; /* Центрирование по вертикали */
+}
+.header .links a.logout:hover {
+  background-color: darkgreen;
+  color: white;
+}
+.header .links a.login:hover {
+  background-color: forestgreen; /* Более темный цвет при наведении */
+  transform: translateY(-2px); /* Эффект поднятия кнопки */
+}
+
+.header .links a.logout {
+  background-color: darkgreen; /* Красный цвет для кнопки выхода */
+  color: white; /* Цвет текста */
+}
+
+.header .links a {
+  text-decoration: none;
+  font-size: 16px;
+  color: white;
+  padding: 8px 15px;
+  border-radius: 30px;
+  border: 2px solid #4CAF50;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.header .links a:hover {
+  background-color: #4CAF50;
+  color: white;
+}
+
+.content {
+  flex: auto; /* Занимает оставшееся пространство */
+  padding-top: 20px; /* Отступы вокруг контента *!*/
+  margin-top: 20px; /* Отступ снизу для размещения выше футера */
+  margin-bottom: 20px; /* Отступ сверху для размещения ниже заголовка */
+  overflow: auto; /* Позволяет прокручивать контент, если он выходит за границы */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+.footer {
+  width: 100%;
+  background-color: #333;
+  padding: 10px 0;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 15px;
+}
+.footer a {
+  text-decoration: none;
+  color: #4CAF50;
+  font-size: 16px;
+  padding: 8px 15px;
+  border: 2px solid #4CAF50;
+  border-radius: 20px;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+.footer a:hover {
+  background-color: #4CAF50;
+  color: white;
+}
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+}
+
+body {
+  font-family: Arial, sans-serif;
+  line-height: 1.6;
+  color: #333;
+  /* background-color: #f9f9f9; */
+  background-color: #414141;
+}
+
+.container {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+/* Header Styles */
+
+header {
+  background-color: #333;
+  color: #fff;
+  padding: 1em;
+  text-align: center;
+}
+
+header nav ul button {
+  background-color: #333;
+  border: none;
+  padding: 10px 20px;
+  cursor: pointer;
+  position: absolute;
+  left: 0;
+  font-size: larger;
+}
+
+header nav ul button a {
+  color: mediumspringgreen;
+}
+
+header nav ul button a:hover {
+  /* background-color: #444; */
+  color: #00a761;
+}
+
+header nav ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+header nav li {
+  margin-right: 100px;
+}
+
+header nav a {
+  color: #fff;
+  text-decoration: none;
+}
+
+header nav a:hover {
+  color: #ccc;
+}
+
+header nav a.active {
+  font-weight: bold;
+  color: mediumspringgreen;
+}
+
+/* Main Content Styles */
+
+main {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  /* padding: 1em; */
+  /* height: 100%; */
+  flex: 1;
+}
+
+main section {
+  background-color: #fff;
+  padding: 1em;
+  margin: 0em 12em;
+  border: 1px solid #ddd;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  flex: 1;
+}
+
+.hidden {
+  display: none;
+}
+
+main div button {
+  font-size: large;
+  color: mediumspringgreen;
+  background-color: #414141;
+  padding: 8px;
+  margin-top: 0.5em;
+  margin-bottom: 0.5em;
+  cursor: pointer;
+}
+
+main div button:hover {
+  color: #00a761;
+  background-color: #333;
+}
+
+.center {
+  text-align: center;
+}
+ 
+/* Course-adding form */
+
+.course-form, .article-form, .test-form, .questions-form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.course-form input, .article-form input, .test-form input, .questions-form input, .course-form textarea, .article-form textarea, .test-form textarea, .questions-form textarea {
+  width: 300px;
+  height: 40px;
+  margin-bottom: 20px;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 16px;
+}
+
+.course-form textarea, .article-form textarea, .test-form textarea, .questions-form textarea {
+  height: 100px;
+  font-size: large;
+}
+
+.course-form button[type="submit"], .article-form button[type="submit"], .test-form button[type="submit"], .questions-form button[type="submit"] {
+  width: 300px;
+  height: 40px;
+  margin-top: 20px;
+  padding: 10px;
+  border: none;
+  background-color: #414141;
+  color: mediumspringgreen;
+  cursor: pointer;
+}
+
+.course-form button[type="submit"]:hover, .article-form button[type="submit"]:hover, .test-form button[type="submit"]:hover, .questions-form button[type="submit"]:hover {
+  background-color: #333;
+  color: #00a761;
+}
+
+/* Footer Styles */
+
+footer {
+  width: 100%;
+  background-color: #333;
+  color: #fff;
+  padding: 1em;
+  text-align: center;
+}
+
+footer p {
+  margin: 0;
+}
+
+/* Table Styles */
+
+table {
+  border-collapse: collapse; /* Объединяет границы ячеек в одну */
+  padding: 0.5em;
+}
+
+table td, table th {
+  border: 1px solid mediumspringgreen;
+  color: white;
+  background: #414141;
+  max-width: 100px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+table td a {
+  color: mediumspringgreen;
+  padding: 8px;
+  margin-top: 0.5em;
+  cursor: pointer;
+}
+
+table td a:hover {
+  color: #00a761;
+}

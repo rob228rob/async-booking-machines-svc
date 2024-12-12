@@ -1,0 +1,372 @@
+body {
+    font-family: 'Arial', sans-serif;
+    margin: 0;
+    padding: 0;
+    height: 100vh;
+    background-color: #f9f9f9;
+    display: flex;
+    flex-direction: column;
+}
+.header {
+    background-color: #333;
+    width: 100%;
+    height: auto; /* Шапка теперь будет иметь автоматическую высоту, адаптируясь под контент */
+    padding: 20px; /* Немного уменьшил отступы, чтобы они выглядели лучше на мобильных */
+    font-size: 28px;
+    color: #4CAF50;
+    font-family: 'Montserrat Alternates', sans-serif;
+    font-weight: 700;
+    display: flex;
+    flex-direction: column; /* На мобильных шапка и ссылки будут вертикально расположены */
+    justify-content: space-between;
+    align-items: center;
+    box-sizing: border-box;
+}
+
+.header .links {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap; /* Кнопки будут оборачиваться, если не поместятся в одну строку */
+    justify-content: center; /* Центрируем ссылки */
+    margin-top: 10px;
+}
+.header .links a.login {
+    background-color: #4CAF50; /* Цвет фона */
+    color: white; /* Цвет текста */
+    font-size: 18px; /* Размер шрифта */
+    padding: 12px 20px; /* Отступы */
+    border-radius: 30px; /* Округленные края */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); /* Тень */
+    transition: background-color 0.3s ease, color 0.3s ease, transform 0.3s ease; /* Плавный переход */
+    display: flex; /* Для выравнивания иконки и текста */
+    align-items: center; /* Центрирование по вертикали */
+}
+.header .links a.login:hover {
+    background-color: forestgreen; /* Более темный цвет при наведении */
+    transform: translateY(-2px); /* Эффект поднятия кнопки */
+}
+.header .links a.logout:hover {
+    background-color: darkgreen;
+    color: white;
+}
+
+
+.header .links a.logout {
+    background-color: darkgreen; /* Красный цвет для кнопки выхода */
+    color: white; /* Цвет текста */
+}
+
+.header .links a {
+    text-decoration: none;
+    font-size: 16px;
+    color: white;
+    padding: 8px 15px;
+    border: 2px solid #4CAF50;
+    border-radius: 20px;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.header .links a:hover {
+    background-color: #4CAF50;
+    color: white;
+}
+.content {
+    flex: auto;
+    padding-top: 80px; /* Увеличиваем отступ сверху, чтобы учесть высоту шапки (40px) и дополнительные отступы */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+.course-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 20px;
+}
+.course-card {
+    background-color: white;
+    border: 4px solid #4CAF50;
+    border-radius: 10px;
+    padding: 20px;
+    width: 200px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: box-shadow 0.3s ease;
+    position: relative;
+    text-decoration: none;
+    color: inherit;
+}
+.question-card {
+    background-color: white;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 15px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+    position: relative;
+    height: 200px; /* Фиксированная высота для всех карточек */
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    overflow: hidden;
+}
+
+.question-card h3 {
+    font-size: 20px;
+    color: #333;
+    margin: 0 0 8px;
+}
+
+.question-card p {
+    margin: 8px 0;
+    color: #666;
+    line-height: 1.4;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 3; /* Ограничение строк до 3 */
+    -webkit-box-orient: vertical;
+}
+
+.question-card .date {
+    font-size: 14px;
+    color: #999;
+}
+
+.answer-button {
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    position: absolute;
+    bottom: 15px;
+    right: 15px;
+    transition: background-color 0.3s;
+}
+
+.answer-button:hover {
+    background-color: #45a049;
+}
+
+.empty-message {
+    text-align: center;
+    color: #666;
+    font-size: 18px;
+}
+
+/* Стили для модального окна ответа */
+.modal {
+    display: none; /* Скрыто по умолчанию */
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.modal-content {
+    background-color: white;
+    padding: 20px;
+    border-radius: 8px;
+    width: 300px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+    text-align: center;
+}
+
+.modal-content textarea {
+    width: 100%;
+    padding: 8px;
+    margin: 10px 0;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+.modal-buttons {
+    display: flex;
+    justify-content: space-around;
+    margin-top: 15px;
+}
+
+.submit-button, .close-button {
+    padding: 8px 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.submit-button {
+    background-color: #4CAF50;
+    color: white;
+}
+
+.close-button {
+    background-color: #d9534f;
+    color: white;
+}
+
+.course-card:hover {
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+}
+.course-card h3 {
+    font-size: 22px;
+    margin-bottom: 10px;
+    color: #333;
+}
+.course-card p {
+    font-size: 16px;
+    color: #555;
+}
+.course-card .price-label {
+    font-size: 14px;
+    font-weight: bold;
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    padding: 5px 10px;
+    background-color: #4CAF50;
+    color: white;
+    border-radius: 5px;
+}
+.course-card .price-label.free {
+    background-color: #4CAF50;
+}
+.course-card .price-label.paid {
+    background-color: #FF5722;
+}
+/* Стили для контейнера поиска */
+.search-bar {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%; /* Занимаем всю ширину страницы */
+    margin-top: 20px; /* Отступ сверху */
+    position: relative;
+    flex-direction: column;
+}
+
+/* Стили для инпута поиска */
+#search-input {
+    width: 50%; /* Ширина инпута 50% от ширины родительского контейнера */
+    padding: 10px;
+    font-size: 16px;
+    border: 2px solid #4CAF50;
+    border-radius: 20px;
+    outline: none;
+    transition: box-shadow 0.3s ease;
+}
+
+/* Фокусное состояние для поиска */
+#search-input:focus {
+    box-shadow: 0 0 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Стили для выпадающего списка результатов поиска */
+.dropdown {
+    list-style-type: none;
+    padding: 8px;
+    margin: 0;
+    border: 1px solid #ccc;
+    max-height: 200px;
+    background-color: white;
+    position: absolute;
+    width: 50%; /* Соответствует ширине инпута поиска */
+    top: calc(100% + 5px); /* Отображение под инпутом */
+    left: 25%; /* Центрируем dropdown, как инпут */
+    z-index: 200;
+    display: none;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 5px;
+    transition: opacity 0.3s ease;
+    opacity: 0;
+}
+
+/* Показ списка */
+.dropdown.show {
+    display: block;
+    opacity: 1;
+}
+
+/* Элементы списка */
+.dropdown li {
+    padding: 10px 12px;
+    cursor: pointer;
+    font-size: 14px;
+    font-family: 'Montserrat Alternates', sans-serif;
+    color: #333;
+    background-color: white;
+    border-bottom: 1px solid #eee;
+}
+
+.dropdown li:last-child {
+    border-bottom: none;
+}
+
+/* Ховер эффект для элементов списка */
+.dropdown li:hover {
+    background-color: #f9f9f9;
+    color: #007bff;
+}
+
+.footer {
+    width: 100%;
+    background-color: #333;
+    padding: 10px 0;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 15px;
+}
+.footer a {
+    text-decoration: none;
+    color: #4CAF50;
+    font-size: 16px;
+    padding: 8px 15px;
+    border: 2px solid #4CAF50;
+    border-radius: 20px;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+.footer a:hover {
+    background-color: #4CAF50;
+    color: white;
+}
+@media (max-width: 768px) {
+    .header {
+        padding: 10px; /* Сократим отступы для мобильных */
+    }
+
+    .header .title {
+        font-size: 24px; /* Уменьшаем размер шрифта заголовка */
+    }
+
+    .header .links {
+        flex-direction: column; /* Ссылки теперь будут расположены в колонку на мобильных */
+        align-items: center;    /* Центрируем их */
+    }
+
+    .header .links a {
+        padding: 6px 12px; /* Уменьшаем размер кнопок на мобильных */
+        font-size: 14px;
+    }
+}
+
+/* Для больших экранов (десктопы и ноутбуки) */
+@media (min-width: 769px) {
+    .header {
+        flex-direction: row; /* Шапка горизонтальная */
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .header .links {
+        flex-direction: row; /* Кнопки в строку */
+        justify-content: flex-end; /* Выровняем кнопки справа */
+    }
+}

@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Бронирование Машин</title>
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            background-color: #f9f9f9;
+            display: flex;
+            flex-direction: column;
+        }
+        .header {
+            background-color: #333;
+            width: 100%;
+            padding: 20px;
+            font-size: 28px;
+            color: #4CAF50;
+            font-family: 'Montserrat Alternates', sans-serif;
+            font-weight: 700;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 1;
+            box-sizing: border-box;
+        }
+        .header .links {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: center;
+            margin-top: 10px;
+        }
+        .header .links a {
+            text-decoration: none;
+            font-size: 16px;
+            color: white;
+            padding: 8px 15px;
+            border: 2px solid #4CAF50;
+            border-radius: 30px;
+            transition: background-color 0.3s ease, color 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .header .links a.login, .header .links a.logout {
+            background-color: darkgreen;
+            color: white;
+            border: none;
+        }
+        .header .links a.login:hover, .header .links a.logout:hover {
+            background-color: #2e7d32;
+            transform: translateY(-2px);
+        }
+        .content {
+            flex: 1;
+            padding-top: 80px; /* Увеличиваем отступ сверху для учета фиксированной шапки */
+            padding-bottom: 60px; /* Отступ снизу для футера */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        h2 {
+            color: #4CAF50;
+            margin-top: 0;
+        }
+
+        .controls {
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .controls label {
+            margin-right: 10px;
+            font-weight: bold;
+        }
+
+        .controls input[type="date"],
+        .controls select {
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        .controls button {
+            background-color: #4CAF50;
+            color: #fff;
+            border: none;
+            padding: 10px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .controls button:hover {
+            background-color: #45a049;
+        }
+
+        /* Стили для кнопки бронирования */
+        .time-slot button {
+            margin-top: 10px;
+            padding: 8px 12px;
+            font-size: 14px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .time-slot button:hover {
+            background-color: #45a049;
+        }
+
+        .time-slot .booked[disabled] {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+        .time-slot button {
+            margin-left: auto;
+            padding: 6px 12px;
+            border: none;
+            border-radius: 4px;
+            background-color: #4CAF50;
+            color: #fff;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .time-slot button:hover {
+            background-color: #45a049;
+        }
+
+        .time-slot .booked[disabled] {
+            background-color: #ccc;
+            border: none;
+            cursor: default;
+            color: #666;
+        }
+        .machines-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            justify-content: center;
+        }
+
+        .machine-card {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 16px;
+            background-color: #f9f9f9;
+            text-align: center;
+            width: 250px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .machine-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        }
+
+        .machine-card h3 {
+            margin-top: 0;
+            font-size: 20px;
+        }
+
+        .machine-card p {
+            margin: 5px 0;
+            font-size: 14px;
+        }
+
+        /* Стили для слотов */
+        .slots-container {
+            margin-top: 20px;
+        }
+
+        .slot {
+            border: 1px solid #ddd;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+        }
+
+        .controls {
+            margin-top: 20px;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        .footer {
+            width: 100%;
+            background-color: #333;
+            padding: 10px 0;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+        }
+        .footer a {
+            text-decoration: none;
+            color: #4CAF50;
+            font-size: 16px;
+            padding: 8px 15px;
+            border: 2px solid #4CAF50;
+            border-radius: 20px;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+        .footer a:hover {
+            background-color: #4CAF50;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+<div class="header">
+    <div class="title">Бронирование стиральных машинок</div>
+    <div class="links">
+        <a href="/home">Главная</a>
+        <a href="/profile">Профиль</a>
+        <a href="/bookings" class="current">Бронирования</a>
+        <a href="/logout" class="logout">Выйти</a>
+    </div>
+</div>
+
+<div class="content">
+    <h2>Выберите машинку для просмотра слотов</h2>
+    <div class="machines-container" id="machines-list">
+        <!-- Машинки будут загружены сюда -->
+    </div>
+
+    <div class="controls" id="slots-controls" style="display: none;">
+        <label for="start-date">Выберите начальную дату:</label>
+        <input type="date" id="start-date">
+
+        <label for="weeks">Количество недель:</label>
+        <select id="weeks">
+            <option value="1">1 неделя</option>
+            <option value="2">2 недели</option>
+            <option value="3" selected>3 недели</option>
+            <option value="4">4 недели</option>
+        </select>
+
+        <button id="load-slots-button">Загрузить слоты</button>
+    </div>
+
+    <div class="slots-container" id="machines-container">
+        <!-- Сгенерированные слоты для выбранной машинки будут отображаться здесь -->
+    </div>
+</div>
+
+<div class="footer">
+    <footer>
+        <span>©️ Бронирование стиральных машинок 2024</span>
+    </footer>
+    <a href="/report-issue"><b>Обратная связь</b></a>
+</div>
+
+<script type="text/javascript" src="/js/bookings.js"></script>
+</body>
+</html>
