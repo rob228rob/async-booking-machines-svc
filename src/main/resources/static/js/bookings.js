@@ -1,4 +1,6 @@
 let selectedMachineId = null;
+let pollingInterval = 150; // Интервал в миллисекундах
+let maxAttempts = 5; // Максимальное количество попыток
 
 document.addEventListener('DOMContentLoaded', () => {
     loadMachines().then(() => console.log("machines loaded"));
@@ -167,7 +169,10 @@ function displayGeneratedSlots(machines) {
     });
 }
 
-
+/**
+ * Функция для обработки бронирования асинхронно с поллингом статуса
+ * @param {Event} event - Событие клика на кнопке бронирования
+ */
 async function handleBooking(event) {
     const machineId = event.target.getAttribute('data-machine-id');
     const resDate = event.target.getAttribute('data-res-date');
@@ -179,9 +184,9 @@ async function handleBooking(event) {
         return;
     }
 
-    if (!confirm('Вы уверены, что хотите забронировать этот слот?')) {
-        return;
-    }
+    // if (!confirm('Вы уверены, что хотите забронировать этот слот?')) {
+    //     return;
+    // }
 
     const reservationRequest = {
         machineId: machineId,
@@ -200,17 +205,174 @@ async function handleBooking(event) {
             body: JSON.stringify(reservationRequest),
         });
 
-        if (response.ok) {
-            await loadMachineTimeSlots();
-        } else {
+        if (response.status === 202) { // HTTP 202 Accepted
+            const statusUrl = response.headers.get('Location');
+            const reservationId = extractReservationIdFromUrl(statusUrl);
+            showSuccessMessage('Бронирование инициировано. Ожидайте обновления статуса.');
+
+            // Начинаем поллинг статуса
+            pollReservationStatus(reservationId, statusUrl);
+        } else if (response.status === 400) {
+            alert('Выбрана невалидная дата, в прошлое нельзя бронироваться')
+        }
+        else {
             const errorData = await response.json();
             alert(`Ошибка при бронировании: ${errorData.message || 'Неизвестная ошибка.'}`);
         }
     } catch (error) {
         console.error('Ошибка при бронировании:', error);
         alert('Произошла ошибка при бронировании. Пожалуйста, попробуйте позже.');
+    } finally {
+        //hideSpinner();
     }
 }
+
+/**
+ * Функция для извлечения reservationId из URL статуса
+ * @param {string} statusUrl - URL статуса
+ * @returns {string} - reservationId
+ */
+function extractReservationIdFromUrl(statusUrl) {
+    const parts = statusUrl.split('/');
+    return parts[parts.length - 1];
+}
+
+/**
+ * Функция для поллинга статуса бронирования с использованием SweetAlert2
+ * @param {string} reservationId - ID бронирования
+ * @param {string} statusUrl - URL для проверки статуса
+ */
+function pollReservationStatus(reservationId, statusUrl) {
+
+    let attempts = 0;
+
+    console.log(`Начало поллинга статуса бронирования ID: ${reservationId}`);
+
+    const intervalId = setInterval(async () => {
+        console.log(`Проверка статуса бронирования ID: ${reservationId}, попытка ${attempts + 1}`);
+
+        try {
+            const response = await fetch(statusUrl, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                credentials: 'include'
+            });
+
+            if (response.ok) {
+                const statusText = await response.text();
+                console.log(`Статус бронирования ID: ${reservationId} - ${statusText}`);
+
+                if (statusText === 'Operation completed successfully') {
+                    console.log({
+                        title: 'Бронирование завершено',
+                        text: 'Ваше бронирование успешно завершено!',
+                        icon: 'success',
+                        timer: 5000,
+                        showConfirmButton: false
+                    });
+                    clearInterval(intervalId);
+                    await loadMachineTimeSlots(); // Обновление списка слотов после успешного бронирования
+                } else if (statusText.startsWith('Operation failed')) {
+                    console.log({
+                        title: 'Ошибка бронирования',
+                        text: `Бронирование не удалось: ${statusText}`,
+                        icon: 'error',
+                        timer: 5000,
+                        showConfirmButton: false
+                    });
+                    alert(`Бронирование не удалось: ${statusText}`)
+                    clearInterval(intervalId);
+                } else {
+                    console.log(`Текущее состояние бронирования (${reservationId}): ${statusText}`);
+                }
+            } else if (response.status === 404) {
+                console.error('Статус бронирования не найден.');
+                console.log({
+                    title: 'Ошибка',
+                    text: 'Статус бронирования не найден.',
+                    icon: 'error',
+                    confirmButtonText: 'Ок'
+                });
+                alert(`Статус бронирования не найден`)
+                clearInterval(intervalId);
+            } else {
+                const errorData = await response.json();
+                console.error('Ошибка при проверке статуса бронирования:', errorData);
+                console.log({
+                    title: 'Ошибка',
+                    text: 'Не удалось проверить статус бронирования.',
+                    icon: 'error',
+                    confirmButtonText: 'Ок'
+                });
+                alert(`не удалось проверить статус: ${errorData}`);
+                clearInterval(intervalId);
+            }
+        } catch (error) {
+            console.error('Ошибка при проверке статуса бронирования:', error);
+            console.log({
+                title: 'Ошибка',
+                text: 'Произошла ошибка при проверке статуса бронирования.',
+                icon: 'error',
+                confirmButtonText: 'Ок'
+            });
+            alert(`не удалось проверить статус: ${error.message}`);
+            clearInterval(intervalId);
+        }
+
+        attempts++;
+        if (attempts >= maxAttempts) {
+            console.error('Время ожидания ответа от сервера истекло.');
+            console.log({
+                title: 'Время истекло',
+                text: 'Время ожидания ответа от сервера истекло.',
+                icon: 'warning',
+                confirmButtonText: 'Ок'
+            });
+            clearInterval(intervalId);
+        }
+    }, pollingInterval);
+}
+
+/**
+ * Функция для отображения сообщения об успешном действии
+ * @param {string} message - Текст сообщения
+ */
+function showSuccessMessage(message) {
+    let successMessage = document.getElementById('success-message');
+    if (!successMessage) {
+        successMessage = document.createElement('success-message')
+    }
+    successMessage.textContent = message;
+    successMessage.classList.remove('error');
+    successMessage.classList.add('success');
+    successMessage.style.display = 'block';
+
+
+    // Скрыть сообщение через 5 секунд
+    setTimeout(() => {
+        successMessage.style.display = 'none';
+    }, 5000);
+}
+
+/**
+ * Функция для отображения сообщения об ошибке
+ * @param {string} message - Текст сообщения
+ */
+function showErrorMessage(message) {
+    const errorMessage = document.getElementById('error-message');
+    errorMessage.textContent = message;
+    errorMessage.classList.remove('success');
+    errorMessage.classList.add('error');
+    errorMessage.style.display = 'block';
+
+    // Скрыть сообщение через 5 секунд
+    setTimeout(() => {
+        errorMessage.style.display = 'none';
+    }, 5000);
+}
+
 
 function formatTimeSlot(slot) {
     const start = formatTime(slot.startTime);

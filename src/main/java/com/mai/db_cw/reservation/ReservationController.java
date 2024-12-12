@@ -1,11 +1,11 @@
 package com.mai.db_cw.reservation;
 
-import com.fasterxml.uuid.Generators;
+import com.mai.db_cw.infrastructure.utility.OperationStorage;
+import com.mai.db_cw.infrastructure.utility.OperationUtility;
 import com.mai.db_cw.machines.dto.ReservationLog;
 import com.mai.db_cw.reservation.dao.ReservationRepository;
 import com.mai.db_cw.reservation.dto.ReservationRequest;
 import com.mai.db_cw.reservation.dto.ReservationUserResponse;
-import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -24,6 +24,7 @@ public class ReservationController {
 
     private final ReservationService reservationService;
     private final ReservationRepository reservationRepository;
+    private final OperationStorage operationStorage;
 
     /**
      * Эндпоинт для получения всех бронирований конкретного пользователя
@@ -61,36 +62,35 @@ public class ReservationController {
      * @return ID бронирования и информация о том, как проверить статус
      */
     @PostMapping("/book")
-    public ResponseEntity<String> createReservation(
+    public ResponseEntity<Void> createReservation(
             @RequestBody ReservationRequest request,
             Principal principal) {
-        //генерируем айди который отдается пользователю в качестве id операции
-        UUID reservationId = Generators.timeBasedEpochGenerator().generate();
 
+        UUID reservationId = operationStorage.addOperationReturningUUID();
         reservationService.bookReservation(reservationId, principal.getName(), request);
         String statusUrl = "/api/reservations/status/" + reservationId.toString();
-        String responseMessage = "Запрос принят в обработку. Проверьте статус бронирования по адресу: " + statusUrl;
+        log.info("reservation request: reservId {}; userEmail {};", reservationId, principal.getName());
 
-        log.info("reservation request: reservId {}; userEmail {}; msg {}", reservationId, principal.getName(), responseMessage);
         return ResponseEntity
                 .status(HttpStatus.ACCEPTED)
                 // отдаем заголовом с url который можно опрашивать относительно статуса операции
                 .header("Location", statusUrl)
-                .body(responseMessage);
+                .build();
     }
 
     /**
      * Endpoint для проверки статуса бронирования по ID.
      *
      * @param reservationId ID бронирования
-     * @return Статус 200 если добавление завершилось или 404 если не найдено
+     * @return Статус 200 если добавление завершилось успешно
+     * или 404 если не найдено
+     * или HttpStatus который будет в объекте
      */
     @GetMapping("/status/{reservationId}")
     public ResponseEntity<String> getReservationStatus(@PathVariable UUID reservationId) {
-        boolean finished = reservationService.checkReservationExist(reservationId);
-        return finished
-                ? ResponseEntity.ok("Бронирование успешно добавлено!")
-                : ResponseEntity.notFound().build();
+        var operationStatus = operationStorage.getOperationStatus(reservationId);
+        log.info("status checked operation on reservation with id {}, status {}", reservationId, operationStatus.toString());
+        return OperationUtility.responseEntityDependsOnOperationStatus(operationStatus);
     }
 
     /**

@@ -1,7 +1,11 @@
 package com.mai.db_cw.reservation.dao;
+import com.mai.db_cw.infrastructure.exceptions.ApplicationException;
+import com.mai.db_cw.infrastructure.utility.OperationStorage;
 import com.mai.db_cw.machines.dto.ReservationLog;
 import com.mai.db_cw.reservation.Reservation;
 import com.mai.db_cw.reservation.dto.ReservationUserResponse;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.http.HttpStatus;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
@@ -36,6 +40,7 @@ public class ReservationRepository {
             .creationTime(rs.getTimestamp("creation_time").toLocalDateTime())
             .modifiedTime(rs.getTimestamp("modified_time").toLocalDateTime())
             .build();
+    private final OperationStorage operationStorage;
 
     /**
      * Поиск всех бронирований пользователя
@@ -135,6 +140,8 @@ public class ReservationRepository {
                 WHERE 
                     r.user_id = :userId
                 ORDER BY 
+                    r.res_date DESC,
+                    r.start_time DESC,
                     r.creation_time DESC
                 """;
 
@@ -189,9 +196,49 @@ public class ReservationRepository {
 
     @Async
     public void deleteReservationById(UUID reservationId) {
-        String sql = "delete from reservations where id = :id";
+        try {
+            String sql = "delete from reservations where id = :id";
+
+            MapSqlParameterSource params = new MapSqlParameterSource()
+                    .addValue("id", reservationId);
+
+            jdbcTemplate.update(sql, params);
+            operationStorage.successfully(reservationId);
+        } catch (ApplicationException e) {
+            operationStorage.failOperation(reservationId, e.getMessage(), e.getHttpStatus());
+        } catch (DataIntegrityViolationException e) {
+            operationStorage.failOperation(reservationId, e.getMessage(), HttpStatus.CONFLICT);
+        } catch (RuntimeException e) {
+            operationStorage.failOperation(reservationId, e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    public int count() {
+        String sql = "select count(id) as cnt from reservations";
+        return jdbcTemplate.query(sql, Collections.emptyMap(), (rs, c) -> rs.getInt("cnt")).stream().findFirst().orElse(0);
+    }
+
+    public List<Reservation> findAll() {
+        String sql = "select * from reservations where status like '%ACTIVE%' or status like '%PENDING% " +
+                "order by creation_time desc'";
+        return jdbcTemplate.query(sql, reservationRowMapper);
+    }
+
+    /**
+     * Обновление статуса и времени изменения бронирования
+     *
+     * @param reservation объект бронирования
+     */
+    public void updateStatus(Reservation reservation) {
+        String sql = "UPDATE reservations " +
+                "SET status = :status, " +
+                "modified_time = :modifiedTime " +
+                "WHERE id = :id";
+
         MapSqlParameterSource params = new MapSqlParameterSource()
-                .addValue("id", reservationId);
+                .addValue("id", reservation.getId())
+                .addValue("status", reservation.getStatus())
+                .addValue("modifiedTime", reservation.getModifiedTime());
 
         jdbcTemplate.update(sql, params);
     }

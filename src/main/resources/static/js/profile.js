@@ -106,9 +106,9 @@ async function handleDeleteReservation(event) {
     const reservationId = event.target.getAttribute('data-reservation-id');
     if (!reservationId) return;
 
-    // Подтверждение действия
-    const confirmDelete = confirm('Вы уверены, что хотите удалить это бронирование? Это действие нельзя отменить.');
-    if (!confirmDelete) return;
+    // Подтверждение действия, временно отключено
+    // const confirmDelete = confirm('Вы уверены, что хотите удалить это бронирование? Это действие нельзя отменить.');
+    // if (!confirmDelete) return;
 
     try {
         const response = await fetch(`/api/reservations/del/${reservationId}`, {
@@ -120,7 +120,7 @@ async function handleDeleteReservation(event) {
         });
 
         if (response.ok || response.status === 204) {
-            showSuccessMessage('Бронирование успешно удалено!');
+            showSuccessMessage('Бронирование отправлено на удаление!');
             // Обновление
             await loadUserReservations();
         } else if (response.status === 404) {

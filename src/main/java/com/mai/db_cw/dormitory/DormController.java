@@ -1,6 +1,8 @@
 package com.mai.db_cw.dormitory;
 
 import com.fasterxml.uuid.Generators;
+import com.mai.db_cw.infrastructure.utility.OperationStorage;
+import com.mai.db_cw.infrastructure.utility.OperationUtility;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -11,6 +13,8 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.UUID;
 
+import static com.mai.db_cw.infrastructure.utility.OperationUtility.responseEntityDependsOnOperationStatus;
+
 @Slf4j
 @RestController
 @RequestMapping("/api/dorm")
@@ -18,6 +22,7 @@ import java.util.UUID;
 public class DormController {
 
     private final DormitoryRepository dormitoryRepository;
+    private final OperationStorage operationStorage;
 
     @GetMapping("/get-all")
     public ResponseEntity<List<Dormitory>> getAllDormitories() {
@@ -29,6 +34,7 @@ public class DormController {
     @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/del/{dormId}")
     public ResponseEntity<UUID> delDormitories(@PathVariable UUID dormId) {
+        operationStorage.addOperation(dormId);
         dormitoryRepository.deleteAsync(dormId);
 
         return ResponseEntity
@@ -38,10 +44,10 @@ public class DormController {
 
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/add")
-    public ResponseEntity<UUID> delDormitories(
+    public ResponseEntity<UUID> addNewDormitory(
             @RequestParam String name,
             @RequestParam String address) {
-        UUID randomId = Generators.timeBasedEpochGenerator().generate();
+        UUID randomId = operationStorage.addOperationReturningUUID();
         dormitoryRepository.save(Dormitory
                 .builder()
                 .id(randomId)
@@ -51,6 +57,15 @@ public class DormController {
 
         return ResponseEntity
                 .status(HttpStatus.ACCEPTED)
+                .header("Location", "/api/dorm/status/" + randomId.toString())
                 .body(randomId);
+    }
+
+    @GetMapping("/status/{operationId}")
+    public ResponseEntity<String> getOperationStatus(
+            @PathVariable UUID operationId) {
+        var operationStatus = operationStorage.getOperationStatus(operationId);
+
+        return responseEntityDependsOnOperationStatus(operationStatus);
     }
 }

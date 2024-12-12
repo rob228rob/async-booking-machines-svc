@@ -31,16 +31,14 @@ public class MachineRepository{
     }
 
     public void saveMachine(Machine machine) {
-        String sql = "INSERT INTO machines (id, dormitory_id, machine_type_id, name, creation_time, modified_time) " +
-                "VALUES (:id, :dormitoryId, :machineTypeId, :name, :creationTime, :modifiedTime)";
+        String sql = "INSERT INTO machines (id, dormitory_id, machine_type_id, name) " +
+                "VALUES (:id, :dormitoryId, :machineTypeId, :name)";
 
         MapSqlParameterSource params = new MapSqlParameterSource()
                 .addValue("id", machine.getId())
                 .addValue("dormitoryId", machine.getDormitoryId())
                 .addValue("machineTypeId", machine.getMachineTypeId())
-                .addValue("name", machine.getName())
-                .addValue("creationTime", machine.getCreationTime())
-                .addValue("modifiedTime", machine.getModifiedTime());
+                .addValue("name", machine.getName());
 
         jdbcTemplate.update(sql, params);
     }

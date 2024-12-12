@@ -45,7 +45,9 @@ public class MachineSlotService {
         List<Machine> machines = machineRepository.findAllMachines();
         if (machines.isEmpty()) {
             log.error("No machines found");
-            throw new ApplicationException("No machines found", HttpStatus.NOT_FOUND);
+            return MachineTimeSlotResponse.builder()
+                    .slots(Collections.emptyList())
+                    .build();
         }
 
         List<MachineTimeSlot> allMachineTimeSlots = machineSlotRepository.findAllMachineTimeSlots();

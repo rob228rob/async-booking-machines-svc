@@ -110,6 +110,20 @@
 </div>
 
 <div class="admin-container">
+    <!-- Форма для добавления нового общежития -->
+    <h2>Добавить Новое Общежитие</h2>
+    <form id="add-dormitory-form">
+        <label for="dorm-name">Название Общежития:</label>
+        <input type="text" id="dorm-name" name="dormName" placeholder="Введите название общежития" required>
+
+        <label for="dorm-address">Адрес Общежития:</label>
+        <input type="text" id="dorm-address" name="dormAddress" placeholder="Введите адрес общежития" required>
+
+        <button type="submit">Добавить Общежитие</button>
+    </form>
+    <div class="message success" id="dorm-success-message">Общежитие успешно добавлено!</div>
+    <div class="message error" id="dorm-error-message">Ошибка при добавлении общежития. Попробуйте снова.</div>
+
     <!-- Форма для добавления новой машинки -->
     <h2>Добавить Новую Машинку</h2>
     <form id="add-machine-form">

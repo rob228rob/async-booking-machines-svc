@@ -1,7 +1,11 @@
 package com.mai.db_cw.dormitory;
 
+import com.mai.db_cw.infrastructure.exceptions.ApplicationException;
+import com.mai.db_cw.infrastructure.utility.OperationStorage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.http.HttpStatus;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
@@ -19,6 +23,7 @@ import java.util.UUID;
 public class DormitoryRepository {
 
     private final NamedParameterJdbcTemplate jdbcTemplate;
+    private final OperationStorage operationStorage;
 
     private static final RowMapper<Dormitory> dormitoryRowMapper = (rs, i) ->
             Dormitory.builder()
@@ -37,7 +42,8 @@ public class DormitoryRepository {
     }
 
     /**
-     *  Ищем все общаги с лимитом
+     * Ищем все общаги с лимитом
+     *
      * @param limit
      * @return
      */
@@ -65,26 +71,44 @@ public class DormitoryRepository {
 
     @Async
     public void deleteAsync(UUID dormId) {
-        log.info("delete dorm with id: {}", dormId);
-        String sql = "delete from dormitories where id = :dormId";
-        MapSqlParameterSource params = new MapSqlParameterSource()
-                .addValue("dormId", dormId);
+        try {
+            log.info("delete dorm with id: {}", dormId);
+            String sql = "delete from dormitories where id = :dormId";
+            MapSqlParameterSource params = new MapSqlParameterSource()
+                    .addValue("dormId", dormId);
 
-        jdbcTemplate.update(sql, params);
+            jdbcTemplate.update(sql, params);
+            operationStorage.successfully(dormId);
+        } catch (
+                ApplicationException e) {
+            operationStorage.failOperation(dormId, e.getMessage(), e.getHttpStatus());
+        } catch (DataIntegrityViolationException e) {
+            operationStorage.failOperation(dormId, e.getMessage(), HttpStatus.CONFLICT);
+        } catch (RuntimeException e) {
+            operationStorage.failOperation(dormId, e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     /**
      * Просто сохраняем новую общагу
+     *
      * @param build
      */
     @Async
     public void save(Dormitory build) {
-        String sql = "insert into dormitories (id, name, address) values (:id, :name, :address)";
-        MapSqlParameterSource params = new MapSqlParameterSource()
-                .addValue("id", build.getId())
-                .addValue("name", build.getName())
-                .addValue("address", build.getAddress());
+        try {
+            String sql = "insert into dormitories (id, name, address) values (:id, :name, :address)";
+            MapSqlParameterSource params = new MapSqlParameterSource()
+                    .addValue("id", build.getId())
+                    .addValue("name", build.getName())
+                    .addValue("address", build.getAddress());
 
-        jdbcTemplate.update(sql, params);
+            jdbcTemplate.update(sql, params);
+            operationStorage.successfully(build.getId());
+        } catch (ApplicationException e) {
+            operationStorage.failOperation(build.getId(), e.getMessage(), e.getHttpStatus());
+        } catch (RuntimeException e) {
+            operationStorage.failOperation(build.getId(), e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 }

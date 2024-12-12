@@ -29,46 +29,46 @@ CREATE TABLE IF NOT EXISTS users (
     );
 
 CREATE TABLE IF NOT EXISTS roles (
-                                     id SERIAL PRIMARY KEY,
-                                     name VARCHAR(50) NOT NULL UNIQUE
-    );
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(50) NOT NULL UNIQUE
+);
 
 CREATE TABLE IF NOT EXISTS users_roles (
-                                           user_id UUID NOT NULL,
-                                           role_id INT  NOT NULL,
-                                           PRIMARY KEY (user_id, role_id),
+    user_id UUID NOT NULL,
+    role_id INT  NOT NULL,
+    PRIMARY KEY (user_id, role_id),
     FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE,
     FOREIGN KEY (role_id) REFERENCES roles (id) ON DELETE CASCADE
     );
 
 -- общежития, каждая машинка привязывается к определнной общаге
 CREATE TABLE IF NOT EXISTS dormitories (
-                                           id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     name            VARCHAR(255) NOT NULL UNIQUE,
     address         VARCHAR(255),
     creation_time   TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     modified_time   TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-    );
+);
 
 -- типы машинок, пока есть только DRY, WASHING
 CREATE TABLE IF NOT EXISTS machine_types (
-                                             id      SERIAL PRIMARY KEY,
-                                             name    VARCHAR(50) NOT NULL UNIQUE
-    );
+    id      SERIAL PRIMARY KEY,
+    name    VARCHAR(50) NOT NULL UNIQUE
+);
 
 -- непосредственно машинки
 CREATE TABLE IF NOT EXISTS machines (
-                                        id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     dormitory_id    UUID NOT NULL REFERENCES dormitories(id) ON DELETE CASCADE,
     machine_type_id INT NOT NULL REFERENCES machine_types(id) ON DELETE RESTRICT,
     name            VARCHAR(255) NOT NULL,
     creation_time   TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     modified_time   TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     UNIQUE (dormitory_id, machine_type_id, name)
-    );
+);
 
 CREATE TABLE IF NOT EXISTS reservations (
-                                            id            UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    id            UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     user_id       UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     machine_id    UUID NOT NULL REFERENCES machines(id) ON DELETE CASCADE,
     res_date      DATE NOT NULL,
