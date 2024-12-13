@@ -3,7 +3,7 @@ package com.mai.db_cw.reservation;
 import com.mai.db_cw.infrastructure.exceptions.ApplicationException;
 import com.mai.db_cw.infrastructure.exceptions.EntityNotFoundException;
 import com.mai.db_cw.infrastructure.exceptions.InvalidUserInfoException;
-import com.mai.db_cw.infrastructure.utility.OperationStorage;
+import com.mai.db_cw.infrastructure.operation_storage.OperationStorage;
 import com.mai.db_cw.machine_time_slots.MachineTimeSlotRepository;
 import com.mai.db_cw.machines.Machine;
 import com.mai.db_cw.machines.MachineService;
@@ -24,10 +24,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor

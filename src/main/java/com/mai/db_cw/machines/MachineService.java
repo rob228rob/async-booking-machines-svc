@@ -1,8 +1,7 @@
 package com.mai.db_cw.machines;
 
 import com.mai.db_cw.infrastructure.exceptions.ApplicationException;
-import com.mai.db_cw.infrastructure.utility.OperationStatus;
-import com.mai.db_cw.infrastructure.utility.OperationStorage;
+import com.mai.db_cw.infrastructure.operation_storage.OperationStorage;
 import com.mai.db_cw.machines.dao.MachineRepository;
 import com.mai.db_cw.machines.dto.MachineRequest;
 import com.mai.db_cw.machines.dto.MachineResponse;
@@ -13,8 +12,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
-import java.sql.SQLException;
-import java.time.LocalDateTime;
 import java.util.*;
 
 import static com.mai.db_cw.infrastructure.utility.ExceptionUtility.throwIfAnyObjectIsNull;

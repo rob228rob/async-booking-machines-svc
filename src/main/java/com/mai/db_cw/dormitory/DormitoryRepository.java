@@ -1,7 +1,7 @@
 package com.mai.db_cw.dormitory;
 
 import com.mai.db_cw.infrastructure.exceptions.ApplicationException;
-import com.mai.db_cw.infrastructure.utility.OperationStorage;
+import com.mai.db_cw.infrastructure.operation_storage.OperationStorage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;

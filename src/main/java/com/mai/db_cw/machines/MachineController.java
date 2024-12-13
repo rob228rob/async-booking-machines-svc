@@ -1,7 +1,6 @@
 package com.mai.db_cw.machines;
 
-import com.fasterxml.uuid.Generators;
-import com.mai.db_cw.infrastructure.utility.OperationStorage;
+import com.mai.db_cw.infrastructure.operation_storage.OperationStorage;
 import com.mai.db_cw.machines.dto.MachineRequest;
 import com.mai.db_cw.machines.dto.MachineResponse;
 import lombok.RequiredArgsConstructor;

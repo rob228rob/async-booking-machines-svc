@@ -1,8 +1,15 @@
 package com.mai.db_cw.infrastructure.utility;
 
+import com.mai.db_cw.infrastructure.operation_storage.OperationStatus;
+import lombok.experimental.UtilityClass;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
+/**
+ *  утилитный класс для упрощения взаимодействия
+ *  с in-memory OperationStorage
+ */
+@UtilityClass
 public class OperationUtility {
 
     /**
