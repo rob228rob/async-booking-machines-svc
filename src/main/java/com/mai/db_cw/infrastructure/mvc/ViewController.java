@@ -11,6 +11,11 @@ import java.util.UUID;
 @Controller
 public class ViewController {
 
+//    @GetMapping("/auth/google/callback")
+//    public String callback() {
+//        return "home";
+//    }
+
     @GetMapping("/login")
     public String login() {
         return "login";

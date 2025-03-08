@@ -8,6 +8,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -24,11 +25,10 @@ import org.springframework.security.web.access.AccessDeniedHandler;
 @EnableWebSecurity
 @EnableMethodSecurity
 public class SecurityConfiguration {
-
     private final CustomUserDetailsService customUserDetailsService;
-
     private final AccessDeniedHandler accessDeniedHandler;
 
+    private static final String DEFAULT_SUCCESS_URL = "/auth/google/callback";
     private static final String[] WHITE_LIST_ENDPOINTS = {
             "/auth/**",
             "css/**",
@@ -63,6 +63,7 @@ public class SecurityConfiguration {
                         .permitAll())
                 .sessionManagement(sessionManagement ->
                         sessionManagement.sessionCreationPolicy(SessionCreationPolicy.ALWAYS))
+                .oauth2Login(oauth2 -> oauth2.defaultSuccessUrl(DEFAULT_SUCCESS_URL, true));
         ;
 
         return http.build();

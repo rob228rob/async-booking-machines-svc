@@ -8,6 +8,7 @@ import com.mai.db_cw.user.dto.UserRegistrationRequest;
 import com.mai.db_cw.user.dto.UserResponse;
 import com.mai.db_cw.user.UserService;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
@@ -20,6 +21,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
+
 @Slf4j
 @RestController
 @RequiredArgsConstructor
@@ -27,122 +30,55 @@ import org.springframework.web.bind.annotation.*;
 public class AuthController {
 
     private final CustomUserDetailsService userDetailsService;
-
     private final UserService userService;
-
     private final AuthenticationManager authenticationManager;
 
     @GetMapping
     public String healthCheck() {
         return "OK";
     }
-    /**
-     * Регистрация нового пользователя.
-     *
-     * Создает нового пользователя в системе. Требуются логин, пароль и подтверждение пароля.
-     *
-     * <p><b>HTTP Responses:</b></p>
-     * <ul>
-     *   <li><b>200 OK</b>: Пользователь успешно зарегистрирован.
-     *       <ul>
-     *           <li>Тело ответа: {@link UserResponse}</li>
-     *       </ul>
-     *   </li>
-     *   <li><b>409 Conflict</b>: Пользователь с таким логином уже существует.
-     *       <ul>
-     *           <li>Тело ответа: {@link ErrorResponseDto}</li>
-     *       </ul>
-     *   </li>
-     *   <li><b>401 Unauthorized</b>: Неверные данные пользователя.
-     *       <ul>
-     *           <li>Тело ответа: {@link ErrorResponseDto}</li>
-     *       </ul>
-     *   </li>
-     * </ul>
-     *
-     * @param userRegistrationRequest данные для регистрации пользователя
-     * @param request                 HTTP-запрос
-     * @return Ответ с информацией о пользователе или ошибкой
-     */
+
     @PostMapping("/register")
-    public ResponseEntity<?> registerUser(
-            @Valid
-            @RequestBody
-            UserRegistrationRequest userRegistrationRequest,
-            HttpServletRequest request) {
-        throwIfUserAlreadyExists(userRegistrationRequest);
-
+    public ResponseEntity<?> registerUser(@Valid @RequestBody UserRegistrationRequest req,
+                                          HttpServletRequest request) {
+        if (userService.existsByEmail(req.getEmail())) {
+            throw new UserAlreadyExistException("User with email: " + req.getEmail());
+        }
         try {
-            UserResponse userResponse = userService.saveUser(userRegistrationRequest);
-
-            // нужно чтобы аутентифицировать пользователя сразу и добавить в секьюрити контекст
+            UserResponse userResponse = userService.saveUser(req);
             Authentication authentication = authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(
-                            userRegistrationRequest.getEmail(),
-                            userRegistrationRequest.getPassword()
-                    )
+                    new UsernamePasswordAuthenticationToken(req.getEmail(), req.getPassword())
             );
-
-            // добавление в сам контекст
             SecurityContextHolder.getContext().setAuthentication(authentication);
             request.getSession().setAttribute("SPRING_SECURITY_CONTEXT", SecurityContextHolder.getContext());
-
             return ResponseEntity.ok(userResponse);
         } catch (Exception e) {
-            return new ResponseEntity<>(new ErrorResponseDto(e.getMessage(), HttpStatus.BAD_REQUEST.value()), HttpStatus.BAD_REQUEST);
+            return ResponseEntity.badRequest().body(
+                    new ErrorResponseDto("пупупу", HttpStatus.BAD_REQUEST.value())
+            );
         }
     }
 
-    /**
-     * Авторизация пользователя.
-     * Авторизация пользователя с использованием логина и пароля.
-     *
-     * <p><b>HTTP Responses:</b></p>
-     * <ul>
-     *   <li><b>200 OK</b>: Успешная авторизация.</li>
-     *   <li><b>404 Not Found</b>: Пользователь не найден.
-     *       <ul>
-     *           <li>Тело ответа: {@link ErrorResponseDto}</li>
-     *       </ul>
-     *   </li>
-     *   <li><b>401 Unauthorized</b>: Неверный логин или пароль.
-     *       <ul>
-     *           <li>Тело ответа: Строка с сообщением об ошибке</li>
-     *       </ul>
-     *   </li>
-     * </ul>
-     *
-     * @param loginRequest данные для авторизации пользователя
-     * @return Ответ с подтверждением авторизации или ошибкой
-     */
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody @Valid LoginUserDto loginRequest) {
+    public ResponseEntity<?> login(@Valid @RequestBody LoginUserDto loginRequest) {
         try {
             Authentication authentication = authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(
-                            loginRequest.getEmail(),
-                            loginRequest.getPassword()
-                    )
+                    new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword())
             );
             SecurityContextHolder.getContext().setAuthentication(authentication);
-
-            var user = userService.findUserByEmailReturningDto(loginRequest.getEmail());
-
             return ResponseEntity.ok().build();
         } catch (BadCredentialsException e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid email or password");
         }
     }
 
-    /**
-     * Проверяет, существует ли пользователь с указанным email.
-     *
-     * @param userRegistrationRequest данные для регистрации пользователя
-     * @throws UserAlreadyExistException если пользователь уже существует
-     */
-    private void throwIfUserAlreadyExists(@Valid UserRegistrationRequest userRegistrationRequest) {
-        if (userService.existsByEmail(userRegistrationRequest.getEmail())) {
-            throw new UserAlreadyExistException("User with email: " + userRegistrationRequest.getEmail());
-        }
+    @GetMapping("/redirect")
+    public void redirectToGoogle(HttpServletResponse response) throws IOException {
+        response.sendRedirect("/oauth2/authorization/google");
+    }
+
+    @GetMapping("/google/callback")
+    public ResponseEntity<?> oauth2Callback(Authentication authentication) {
+        return ResponseEntity.ok("OAuth2 authentication successful for user: " + authentication.getName());
     }
 }

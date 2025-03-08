@@ -4,8 +4,14 @@ services:
     ports:
       - "8081:8081"
     depends_on:
-      - main_db
+      main_db:
+        condition: service_healthy
+      data-grid-infinispan:
+        condition: service_healthy
     environment:
+      INFINISPAN_SERVER_URL: data-grid-infinispan:11222
+      INFINISPAN_USER: ${USER_INFINISPAN:-admin}
+      INFINISPAN_PASS: ${PASS_INFINISPAN:-password}
       SPRING_DATASOURCE_URL: jdbc:postgresql://main_db:5432/main_db
       SPRING_DATASOURCE_USERNAME: ${MAIN_DB_USERNAME:-postgres}
       SPRING_DATASOURCE_PASSWORD: ${MAIN_DB_PASSWD:-postgres}
@@ -24,6 +30,30 @@ services:
       - my_network
     volumes:
       - pg_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  data-grid-infinispan:
+    image: infinispan/server:latest
+    environment:
+      USER: ${USER_INFINISPAN:-admin}
+      PASS: ${PASS_INFINISPAN:-password}
+      JAVA_OPTS: -Dinfinispan.configuration=file:///opt/infinispan/server/conf/infinispan.xml
+    ports:
+      - "11222:11222"
+    networks:
+      - my_network
+    volumes:
+      - infinispan_data:/opt/infinispan/data
+      - ./src/main/resources/infinispan.xml:/opt/infinispan/server/conf/infinispan.xml:ro
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f -vk https://yandex.ru"]
+      interval: 8s
+      timeout: 15s
+      retries: 1
 
 networks:
   my_network:
@@ -32,3 +62,4 @@ networks:
 volumes:
   pg_data:
   app_backups:
+  infinispan_data:

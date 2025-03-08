@@ -19,7 +19,7 @@ public enum OperationStatus {
     private String cause;
     private HttpStatus httpStatus;
 
-    public void setFailureDetails(String cause, HttpStatus httpStatus) {
+    public synchronized void setFailureDetails(String cause, HttpStatus httpStatus) {
         if (this != FINISHED_UNSUCCESSFULLY) {
             throw new UnsupportedOperationException("Данный метод доступен только для статуса FINISHED_UNSUCCESSFULLY");
         }
@@ -32,8 +32,8 @@ public enum OperationStatus {
         return switch (this) {
             case FINISHED_SUCCESSFULLY -> "successful";
             case FINISHED_UNSUCCESSFULLY -> "unsuccessful";
-            case UNDEFINED -> "undefined";
             case ACCEPTED -> "accepted";
+            case UNDEFINED -> "undefined";
         };
     }
 }

@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<infinispan
+        xmlns="urn:infinispan:config:15.0"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns:server="urn:infinispan:server:config:15.0"
+        xsi:schemaLocation="urn:infinispan:config:15.0 https://infinispan.org/schemas/infinispan-config-15.0.xsd
+                        urn:infinispan:server:config:15.0 https://infinispan.org/schemas/infinispan-server-config-15.0.xsd">
+
+    <!-- Контейнер кешей -->
+    <cache-container name="default">
+        <!-- Настройка транспорта для кластеризации -->
+        <transport stack="tcp" cluster="infinispan-cluster"/>
+
+        <!-- Дефолтный локальный кеш -->
+        <local-cache name="default">
+            <locking isolation="REPEATABLE_READ"/>
+            <transaction mode="NON_XA"/>
+            <expiration lifespan="60000"/>
+            <memory storage="HEAP" max-count="10000" when-full="REMOVE"/>
+        </local-cache>
+
+        <!-- Кеш для операций -->
+        <local-cache name="operationsCache">
+            <locking isolation="REPEATABLE_READ"/>
+            <transaction mode="NON_XA"/>
+            <expiration lifespan="60000"/>
+            <memory storage="HEAP" max-count="10000" when-full="REMOVE"/>
+        </local-cache>
+    </cache-container>
+
+    <!-- Определение сокет биндингов -->
+    <server:socket-bindings>
+        <server:socket-binding name="hotrod" port="11222"/>
+        <server:socket-binding name="rest" port="8080"/>
+        <server:socket-binding name="memcached" port="11211"/>
+    </server:socket-bindings>
+
+    <!-- Определение конечных точек -->
+    <server:endpoints>
+        <server:hotrod socket-binding="hotrod"/>
+        <server:rest socket-binding="rest"/>
+        <server:memcached socket-binding="memcached"/>
+    </server:endpoints>
+</infinispan>
