@@ -1,4 +1,4 @@
-package com.mai.db_cw.machines_type;
+package com.mai.db_cw.coworking_type;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class MachineType {
+public class CoworkingType {
     private Integer id;
     private String name;
 }

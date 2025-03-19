@@ -1,7 +1,7 @@
-package com.mai.db_cw.machines.dao;
+package com.mai.db_cw.coworkings.dao;
 
-import com.mai.db_cw.machines.Machine;
-import com.mai.db_cw.machines.dto.MachineResponse;
+import com.mai.db_cw.coworkings.Coworking;
+import com.mai.db_cw.coworkings.dto.CoworkingResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
@@ -12,14 +12,14 @@ import java.util.*;
 
 @RequiredArgsConstructor
 @Component
-public class MachineRepository{
+public class CoworkingRepository {
 
     private final NamedParameterJdbcTemplate jdbcTemplate;
 
-    private static class MachineRowMapper implements RowMapper<Machine> {
+    private static class MachineRowMapper implements RowMapper<Coworking> {
         @Override
-        public Machine mapRow(java.sql.ResultSet rs, int rowNum) throws java.sql.SQLException {
-            return Machine.builder()
+        public Coworking mapRow(java.sql.ResultSet rs, int rowNum) throws java.sql.SQLException {
+            return Coworking.builder()
                     .id(rs.getObject("id", UUID.class))
                     .dormitoryId(rs.getObject("dormitory_id", UUID.class))
                     .machineTypeId(rs.getInt("machine_type_id"))
@@ -30,15 +30,15 @@ public class MachineRepository{
         }
     }
 
-    public void saveMachine(Machine machine) {
+    public void saveMachine(Coworking coworking) {
         String sql = "INSERT INTO machines (id, dormitory_id, machine_type_id, name) " +
                 "VALUES (:id, :dormitoryId, :machineTypeId, :name)";
 
         MapSqlParameterSource params = new MapSqlParameterSource()
-                .addValue("id", machine.getId())
-                .addValue("dormitoryId", machine.getDormitoryId())
-                .addValue("machineTypeId", machine.getMachineTypeId())
-                .addValue("name", machine.getName());
+                .addValue("id", coworking.getId())
+                .addValue("dormitoryId", coworking.getDormitoryId())
+                .addValue("machineTypeId", coworking.getMachineTypeId())
+                .addValue("name", coworking.getName());
 
         jdbcTemplate.update(sql, params);
     }
@@ -50,7 +50,7 @@ public class MachineRepository{
         jdbcTemplate.update(sql, params);
     }
 
-    public Optional<Machine> findMachineById(UUID id) {
+    public Optional<Coworking> findMachineById(UUID id) {
         String sql = "SELECT * FROM machines WHERE id = :id";
         MapSqlParameterSource params = new MapSqlParameterSource().addValue("id", id);
 
@@ -58,13 +58,13 @@ public class MachineRepository{
     }
 
 
-    public List<Machine> findAllMachines() {
+    public List<Coworking> findAllMachines() {
         String sql = "select * from machines";
 
         return jdbcTemplate.query(sql, new MachineRowMapper()).stream().toList();
     }
 
-    public List<MachineResponse> findAllMachinesReturningDto() {
+    public List<CoworkingResponse> findAllMachinesReturningDto() {
         String sql = "SELECT " +
                 "m.id AS machine_id, " +
                 "m.name AS machine_name, " +
@@ -77,7 +77,7 @@ public class MachineRepository{
         Map<String, Object> params = new HashMap<>();
 
         return jdbcTemplate.query(sql, params, (rs, cnt) -> {
-            return MachineResponse.builder()
+            return CoworkingResponse.builder()
                     .id(UUID.fromString(rs.getString("machine_id")))
                     .name(rs.getString("machine_name"))
                     .dormitoryName(rs.getString("dormitory_name"))

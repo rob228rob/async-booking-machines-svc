@@ -1,8 +1,8 @@
-package com.mai.db_cw.machines;
+package com.mai.db_cw.coworkings;
 
 import com.mai.db_cw.infrastructure.operation_storage.OperationStorage;
-import com.mai.db_cw.machines.dto.MachineRequest;
-import com.mai.db_cw.machines.dto.MachineResponse;
+import com.mai.db_cw.coworkings.dto.CoworkingRequest;
+import com.mai.db_cw.coworkings.dto.CoworkingResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -19,8 +19,8 @@ import static com.mai.db_cw.infrastructure.utility.OperationUtility.responseEnti
 @RequestMapping("/api/machines")
 @Slf4j
 @RequiredArgsConstructor
-public class MachineController {
-    private final MachineService machineService;
+public class CoworkingController {
+    private final CoworkingService coworkingService;
     private final OperationStorage operationStorage;
 
     /**
@@ -29,23 +29,23 @@ public class MachineController {
      * @return
      */
     @GetMapping("/get-all")
-    public ResponseEntity<List<MachineResponse>> getAllMachines() {
+    public ResponseEntity<List<CoworkingResponse>> getAllMachines() {
         return ResponseEntity
-                .ok(machineService.findAllMachines());
+                .ok(coworkingService.findAllMachines());
     }
 
     /**
      * асинхронный метод добавления новой машинки
      * доступен ток админу
      *
-     * @param machineRequest
+     * @param coworkingRequest
      * @return
      */
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/add")
-    public ResponseEntity<UUID> addMachine(@RequestBody MachineRequest machineRequest) {
+    public ResponseEntity<UUID> addMachine(@RequestBody CoworkingRequest coworkingRequest) {
         UUID randomId = operationStorage.addOperationReturningUUID();
-        machineService.runAsyncCreateMachine(randomId, machineRequest);
+        coworkingService.runAsyncCreateMachine(randomId, coworkingRequest);
 
         return ResponseEntity
                 .status(HttpStatus.ACCEPTED)
@@ -64,7 +64,7 @@ public class MachineController {
     @DeleteMapping("/del/{machineId}")
     public ResponseEntity<UUID> deleteMachine(@PathVariable UUID machineId) {
         operationStorage.addOperation(machineId);
-        machineService.deleteAsyncById(machineId);
+        coworkingService.deleteAsyncById(machineId);
         return ResponseEntity.status(HttpStatus.ACCEPTED).body(machineId);
     }
 }

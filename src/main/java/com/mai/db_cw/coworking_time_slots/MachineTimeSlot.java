@@ -1,4 +1,4 @@
-package com.mai.db_cw.machine_time_slots;
+package com.mai.db_cw.coworking_time_slots;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

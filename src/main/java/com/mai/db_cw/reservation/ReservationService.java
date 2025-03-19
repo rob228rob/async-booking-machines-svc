@@ -4,9 +4,9 @@ import com.mai.db_cw.infrastructure.exceptions.ApplicationException;
 import com.mai.db_cw.infrastructure.exceptions.EntityNotFoundException;
 import com.mai.db_cw.infrastructure.exceptions.InvalidUserInfoException;
 import com.mai.db_cw.infrastructure.operation_storage.OperationStorage;
-import com.mai.db_cw.machine_time_slots.MachineTimeSlotRepository;
-import com.mai.db_cw.machines.Machine;
-import com.mai.db_cw.machines.MachineService;
+import com.mai.db_cw.coworking_time_slots.MachineTimeSlotRepository;
+import com.mai.db_cw.coworkings.Coworking;
+import com.mai.db_cw.coworkings.CoworkingService;
 import com.mai.db_cw.reservation.dao.ReservationRepository;
 import com.mai.db_cw.reservation.dto.ReservationRequest;
 import com.mai.db_cw.reservation.dto.ReservationUserResponse;
@@ -35,7 +35,7 @@ public class ReservationService {
     private final ReservationRepository reservationRepository;
     private final MachineTimeSlotRepository machineTimeSlotRepository;
     private final UserService userService;
-    private final MachineService machineService;
+    private final CoworkingService coworkingService;
     private final OperationStorage operationStorage;
 
     /**
@@ -49,7 +49,7 @@ public class ReservationService {
             User user = userService.findByEmail(userEmail)
                     .orElseThrow(() -> new InvalidUserInfoException("Пользователь не найден"));
 
-            Machine machine = machineService.findById(request.machineId())
+            Coworking coworking = coworkingService.findById(request.machineId())
                     .orElseThrow(() -> new EntityNotFoundException("Машинка не найдена"));
 
             // Проверка доступности слота
@@ -73,7 +73,7 @@ public class ReservationService {
             Reservation reservation = Reservation.builder()
                     .id(randomId)
                     .userId(user.getId())
-                    .machineId(request.machineId())
+                    .coworkingId(request.machineId())
                     .resDate(request.resDate())
                     .startTime(request.startTime())
                     .endTime(request.endTime())

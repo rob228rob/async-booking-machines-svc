@@ -1,11 +1,11 @@
-package com.mai.db_cw.machine_time_slots;
+package com.mai.db_cw.coworking_time_slots;
 
-import com.mai.db_cw.dormitory.DormitoryRepository;
+import com.mai.db_cw.coworkings.Coworking;
+import com.mai.db_cw.location.LocationRepository;
 import com.mai.db_cw.infrastructure.exceptions.ApplicationException;
-import com.mai.db_cw.machine_time_slots.dto.MachineTimeSlotResponse;
-import com.mai.db_cw.machines.Machine;
-import com.mai.db_cw.machines.MachineService;
-import com.mai.db_cw.machines.dao.MachineRepository;
+import com.mai.db_cw.coworking_time_slots.dto.MachineTimeSlotResponse;
+import com.mai.db_cw.coworkings.CoworkingService;
+import com.mai.db_cw.coworkings.dao.CoworkingRepository;
 import com.mai.db_cw.reservation.Reservation;
 import com.mai.db_cw.reservation.dao.ReservationRepository;
 import com.mai.db_cw.time_slot.TimeSlot;
@@ -27,13 +27,13 @@ import java.util.stream.Collectors;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class MachineSlotService {
+public class CoworkingTimeSlot {
 
     private final MachineTimeSlotRepository machineSlotRepository;
     private final TimeSlotRepository timeSlotRepository;
-    private final MachineRepository machineRepository;
-    private final DormitoryRepository dormitoryRepository;
-    private final MachineService machineService;
+    private final CoworkingRepository coworkingRepository;
+    private final LocationRepository locationRepository;
+    private final CoworkingService coworkingService;
     private final ReservationRepository reservationRepository;
 
     /**
@@ -42,8 +42,8 @@ public class MachineSlotService {
      * @return DTO с информацией о машинах и их временных слотах.
      */
     public MachineTimeSlotResponse getAllMachinesWithTimeSlots() {
-        List<Machine> machines = machineRepository.findAllMachines();
-        if (machines.isEmpty()) {
+        List<Coworking> coworkings = coworkingRepository.findAllMachines();
+        if (coworkings.isEmpty()) {
             log.error("No machines found");
             return MachineTimeSlotResponse.builder()
                     .slots(Collections.emptyList())
@@ -61,11 +61,11 @@ public class MachineSlotService {
                 .collect(Collectors.groupingBy(MachineTimeSlot::getMachineId));
         log.debug("Grouped by slots list: {}", machineSlotsMap);
 
-        var machineSlots = machines
+        var machineSlots = coworkings
                 .stream()
-                .map(machine -> {
+                .map(coworking -> {
                     List<MachineTimeSlot> machineTimeSlotList = machineSlotsMap
-                            .getOrDefault(machine.getId(), Collections.emptyList());
+                            .getOrDefault(coworking.getId(), Collections.emptyList());
                     log.debug("machine Time Slot List: {}", machineTimeSlotList);
                     List<TimeSlotResponse> timeSlots = machineTimeSlotList
                             .stream()
@@ -82,13 +82,13 @@ public class MachineSlotService {
                                         .build();
                             }).toList();
 
-                    var dormitory = dormitoryRepository
-                            .findDormitoryById(machine.getDormitoryId())
+                    var dormitory = locationRepository
+                            .findDormitoryById(coworking.getDormitoryId())
                             .orElseThrow(() -> new ApplicationException("Dormitory not found", HttpStatus.NOT_FOUND));
 
                     return MachineTimeSlotResponse.TimeSlotsForSingleMachine.builder()
-                            .machineId(machine.getId())
-                            .machineName(machine.getName())
+                            .machineId(coworking.getId())
+                            .machineName(coworking.getName())
                             .dormitoryName(dormitory.getName())
                             .dormitoryAddress(dormitory.getAddress())
                             .timeSlots(timeSlots)
@@ -102,7 +102,7 @@ public class MachineSlotService {
 
     public MachineTimeSlotResponse getMachineSlots(UUID machineId, LocalDate startDate, int weeks) {
         // Получаем информацию о машине
-        Machine machine = machineService.findById(machineId)
+        Coworking coworking = coworkingService.findById(machineId)
                 .orElseThrow(() -> new ApplicationException("Machine not found", HttpStatus.NOT_FOUND));
 
         // Генерируем список дат на указанный период
@@ -134,12 +134,12 @@ public class MachineSlotService {
             slot.setAvailable(!isReserved);
         });
 
-        var dormitory = dormitoryRepository.findDormitoryById(machine.getDormitoryId()).orElseThrow();
+        var dormitory = locationRepository.findDormitoryById(coworking.getDormitoryId()).orElseThrow();
 
         // Собираем ответ
         MachineTimeSlotResponse.TimeSlotsForSingleMachine machineSlots = MachineTimeSlotResponse.TimeSlotsForSingleMachine.builder()
-                .machineId(machine.getId())
-                .machineName(machine.getName())
+                .machineId(coworking.getId())
+                .machineName(coworking.getName())
                 .dormitoryName(dormitory.getName())
                 .dormitoryAddress(dormitory.getAddress())
                 .timeSlots(generatedSlots)

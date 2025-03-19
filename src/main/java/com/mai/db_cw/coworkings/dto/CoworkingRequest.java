@@ -1,8 +1,8 @@
-package com.mai.db_cw.machines.dto;
+package com.mai.db_cw.coworkings.dto;
 
 import java.util.UUID;
 
-public record MachineRequest(
+public record CoworkingRequest(
         UUID dormitoryId,
         String name,
         Integer type

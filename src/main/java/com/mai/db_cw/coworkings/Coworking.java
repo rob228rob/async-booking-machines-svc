@@ -1,4 +1,4 @@
-package com.mai.db_cw.machines;
+package com.mai.db_cw.coworkings;
 
 import lombok.Builder;
 import lombok.Data;
@@ -8,7 +8,7 @@ import java.util.UUID;
 
 @Builder
 @Data
-public class Machine {
+public class Coworking {
     private UUID id;
     private UUID dormitoryId;
     private Integer machineTypeId;

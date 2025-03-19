@@ -1,7 +1,6 @@
-package com.mai.db_cw.machine_time_slots.dto;
+package com.mai.db_cw.coworking_time_slots.dto;
 
 import com.mai.db_cw.time_slot.dto.TimeSlotResponse;
-import com.mai.db_cw.time_slot.dto.TimeSlotsResponse;
 import lombok.Builder;
 import lombok.Data;
 

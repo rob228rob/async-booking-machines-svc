@@ -1,6 +1,6 @@
-package com.mai.db_cw.machine_time_slots;
+package com.mai.db_cw.coworking_time_slots;
 
-import com.mai.db_cw.machine_time_slots.dto.MachineTimeSlotResponse;
+import com.mai.db_cw.coworking_time_slots.dto.MachineTimeSlotResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDate;
-import java.util.List;
 import java.util.UUID;
 
 @Slf4j
@@ -19,7 +18,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class MachineTimeSlotController {
 
-    private final MachineSlotService machineSlotService;
+    private final CoworkingTimeSlot coworkingTimeSlot;
 
     /**
      * ручка для получения всех тайм слотов по всем машинкам
@@ -29,7 +28,7 @@ public class MachineTimeSlotController {
     @GetMapping("/get-all")
     public ResponseEntity<MachineTimeSlotResponse> getAllMachineTimeSlots() {
         return ResponseEntity.ok(
-                machineSlotService.getAllMachinesWithTimeSlots());
+                coworkingTimeSlot.getAllMachinesWithTimeSlots());
     }
 
     @GetMapping("/get")
@@ -40,7 +39,7 @@ public class MachineTimeSlotController {
         // Парсим startDate в LocalDate
         LocalDate start = LocalDate.parse(startDate);
 
-        MachineTimeSlotResponse response = machineSlotService.getMachineSlots(machineId, start, weeks);
+        MachineTimeSlotResponse response = coworkingTimeSlot.getMachineSlots(machineId, start, weeks);
 
         return ResponseEntity.ok(response);
     }

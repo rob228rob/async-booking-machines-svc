@@ -4,21 +4,23 @@
 -- Liquibase ChangeSet
 -- Эта миграция предполагает создание следующих таблиц и объектов:
 -- 0) users, roles, users_roles - таблички для управления ролями и разграничения прав
--- 1) dormitories: Список общежитий
--- 2) machine_types: Типы машин (стиральная/сушильная)
--- 3) machines: Конкретные машины, привязанные к общежитию
--- 4) time_slots: Временные слоты по дням недели
--- 5) reservations: Таблица бронирований машин пользователями с добавлением статуса
+-- 1) locations: Список локаций
+-- 2) coworking_types: Типы коворкингов (при необходимости)
+-- 3) coworkings: Конкретные коворкинги, привязанные к локации
+-- 5) reservations: Таблица бронирований коворкингов пользователями с добавлением статуса
 -- 6) reservation_logs: Логирование действий с бронированиями (после вставки или обновления статуса)
--- 7) Триггер и функция для логирования вставок в reservations
+-- 7) Триггеры и функция для логирования вставок/обновлений/удалений в reservations
 -- 8) Процедура для обновления статуса бронирования
--- 9) Инициализация начальных данных для общежитий, типов машин и временных слотов
-
+-- 9) Инициализация начальных данных для локаций, типов коворкингов и примеров коворкингов
 
 -- changeset admin:001 createTable
+
+------------------------------------------------------------
+-- 0) Таблицы пользователей и ролей
+------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS users (
-    id            UUID PRIMARY KEY,
-    first_name    VARCHAR(255),
+                                     id            UUID PRIMARY KEY,
+                                     first_name    VARCHAR(255),
     last_name     VARCHAR(255),
     email         VARCHAR(255) NOT NULL UNIQUE,
     password      VARCHAR(255) NOT NULL,
@@ -26,87 +28,84 @@ CREATE TABLE IF NOT EXISTS users (
     token_expired BOOLEAN   DEFAULT FALSE,
     creation_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     modified_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
+    );
 
 CREATE TABLE IF NOT EXISTS roles (
-    id SERIAL PRIMARY KEY,
-    name VARCHAR(50) NOT NULL UNIQUE
-);
+                                     id   SERIAL PRIMARY KEY,
+                                     name VARCHAR(50) NOT NULL UNIQUE
+    );
 
 CREATE TABLE IF NOT EXISTS users_roles (
-    user_id UUID NOT NULL,
-    role_id INT  NOT NULL,
-    PRIMARY KEY (user_id, role_id),
+                                           user_id UUID NOT NULL,
+                                           role_id INT  NOT NULL,
+                                           PRIMARY KEY (user_id, role_id),
     FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE,
     FOREIGN KEY (role_id) REFERENCES roles (id) ON DELETE CASCADE
-);
+    );
 
--- общежития, каждая машинка привязывается к определнной общаге
-CREATE TABLE IF NOT EXISTS dormitories (
-    id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    name            VARCHAR(255) NOT NULL UNIQUE,
-    address         VARCHAR(255),
-    creation_time   TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    modified_time   TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
+------------------------------------------------------------
+-- 1) Таблица локаций (ранее "dormitories")
+------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS locations (
+                                         id            UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    name          VARCHAR(255) NOT NULL UNIQUE,
+    address       VARCHAR(255),
+    creation_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    modified_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    );
 
--- типы машинок, пока есть только DRY, WASHING
-CREATE TABLE IF NOT EXISTS machine_types (
-    id      SERIAL PRIMARY KEY,
-    name    VARCHAR(50) NOT NULL UNIQUE
-);
+------------------------------------------------------------
+-- 2) Таблица типов коворкингов (ранее "machine_types"), при необходимости
+------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS coworking_types (
+                                               id   SERIAL PRIMARY KEY,
+                                               name VARCHAR(50) NOT NULL UNIQUE
+    );
 
--- непосредственно машинки
-CREATE TABLE IF NOT EXISTS machines (
-    id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    dormitory_id    UUID NOT NULL REFERENCES dormitories(id) ON DELETE CASCADE,
-    machine_type_id INT NOT NULL REFERENCES machine_types(id) ON DELETE RESTRICT,
-    name            VARCHAR(255) NOT NULL,
-    creation_time   TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    modified_time   TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    UNIQUE (dormitory_id, machine_type_id, name)
-);
+------------------------------------------------------------
+-- 3) Таблица коворкингов (ранее "coworkings")
+------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS coworkings (
+                                          id                 UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    location_id        UUID NOT NULL REFERENCES locations(id) ON DELETE CASCADE,
+    coworking_type_id  INT NOT NULL REFERENCES coworking_types(id) ON DELETE RESTRICT,
+    name               VARCHAR(255) NOT NULL,
+    creation_time      TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    modified_time      TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE (location_id, coworking_type_id, name)
+    );
 
+------------------------------------------------------------
+-- 5) Таблица бронирований (reservations)
+------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS reservations (
-    id            UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+                                            id            UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     user_id       UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-    machine_id    UUID NOT NULL REFERENCES machines(id) ON DELETE CASCADE,
+    coworking_id  UUID NOT NULL REFERENCES coworkings(id) ON DELETE CASCADE,
     res_date      DATE NOT NULL,
     start_time    TIME NOT NULL,
     end_time      TIME NOT NULL,
     status        VARCHAR(50) NOT NULL DEFAULT 'PENDING',
     creation_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     modified_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    UNIQUE (machine_id, res_date, start_time, end_time)
-);
-
--- таблица логов действий на бронированиях
-CREATE TABLE IF NOT EXISTS reservation_logs (
-    id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    reservation_id  UUID,
-    action          TEXT NOT NULL,  -- Тип действия (INSERT, UPDATE, DELETE)
-    old_data        JSONB,  -- Старые данные (для UPDATE и DELETE)
-    new_data        JSONB,  -- Новые данные (для INSERT и UPDATE)
-    action_time     TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    UNIQUE (coworking_id, res_date, start_time, end_time)
     );
 
--- Инициализация базовых типов машин
-INSERT INTO machine_types (name) VALUES ('WASHER')
-    ON CONFLICT (name) DO NOTHING;
-INSERT INTO machine_types (name) VALUES ('DRYER')
-    ON CONFLICT (name) DO NOTHING;
+------------------------------------------------------------
+-- 6) Таблица логов бронирований (reservation_logs)
+------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS reservation_logs (
+                                                id             UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    reservation_id UUID,
+    action         TEXT NOT NULL,        -- Тип действия (INSERT, UPDATE, DELETE)
+    old_data       JSONB,               -- Старые данные (для UPDATE и DELETE)
+    new_data       JSONB,               -- Новые данные (для INSERT и UPDATE)
+    action_time    TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    );
 
--- Инициализация общежитий
-INSERT INTO dormitories (name, address) VALUES ('Морг', 'Улица Академика Павлова, д. 15')
-    ON CONFLICT (name) DO NOTHING;
-INSERT INTO dormitories (name, address) VALUES ('Башня', 'Проспект Мира, д. 10')
-    ON CONFLICT (name) DO NOTHING;
-INSERT INTO dormitories (name, address) VALUES ('Икар', 'Улица Студенческая, д. 25')
-    ON CONFLICT (name) DO NOTHING;
-INSERT INTO dormitories (name, address) VALUES ('Альфа', 'Переулок Технологов, д. 5')
-    ON CONFLICT (name) DO NOTHING;
-
--- Процедура для записи в таблицу логов действий о бронированиях
+------------------------------------------------------------
+-- 7) Функция и триггеры для логирования вставок/обновлений/удалений
+------------------------------------------------------------
 CREATE OR REPLACE FUNCTION log_reservation_changes()
 RETURNS TRIGGER AS $$
 BEGIN
@@ -123,7 +122,6 @@ END IF;
 RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
-
 
 -- Триггер для вставок
 CREATE TRIGGER tr_reservation_insert
@@ -143,8 +141,9 @@ CREATE TRIGGER tr_reservation_delete
     FOR EACH ROW
     EXECUTE PROCEDURE log_reservation_changes();
 
-
--- Процедура для обновления статуса бронирования
+------------------------------------------------------------
+-- 8) Процедура для обновления статуса бронирования
+------------------------------------------------------------
 CREATE OR REPLACE PROCEDURE update_reservation_status(res_id UUID, new_status VARCHAR)
 LANGUAGE plpgsql
 AS $$
@@ -153,34 +152,50 @@ UPDATE reservations
 SET status = new_status, modified_time = NOW()
 WHERE id = res_id;
 
+-- Вставляем запись в лог
 INSERT INTO reservation_logs (reservation_id, action)
 VALUES (res_id, 'UPDATE_STATUS TO ' || new_status);
 
--- Если бронирование отменено, ранее мы обновляли machine_time_slots, теперь слотов нет в БД (раньше были :) )
+-- Если бронирование отменено, здесь можно добавить логику освобождения слота,
+-- если бы велась отдельная таблица тайм-слотов. Сейчас она не используется.
 END;
 $$;
 
--- Вставка машин
-WITH dorm_morg AS (
-    SELECT id FROM dormitories WHERE name = 'Морг'
+------------------------------------------------------------
+-- 9) Инициализация данных
+--    (ДЛЯ ПРИМЕРА: меняем названия; если нужна другая тестовая инфа — подставьте сами)
+------------------------------------------------------------
+
+-- Базовые «типы коворкингов»
+INSERT INTO coworking_types (name) VALUES ('OPEN_SPACE')
+    ON CONFLICT (name) DO NOTHING;
+INSERT INTO coworking_types (name) VALUES ('MEETING_ROOM')
+    ON CONFLICT (name) DO NOTHING;
+
+-- Инициализация локаций (ранее общежития)
+INSERT INTO locations (name, address) VALUES ('Офис на Мира', 'Проспект Мира, д. 10')
+    ON CONFLICT (name) DO NOTHING;
+INSERT INTO locations (name, address) VALUES ('Коворкинг на Павлова', 'Улица Академика Павлова, д. 15')
+    ON CONFLICT (name) DO NOTHING;
+INSERT INTO locations (name, address) VALUES ('Локация “Икар”', 'Улица Студенческая, д. 25')
+    ON CONFLICT (name) DO NOTHING;
+INSERT INTO locations (name, address) VALUES ('Пространство “Альфа”', 'Переулок Технологов, д. 5')
+    ON CONFLICT (name) DO NOTHING;
+
+-- Пример вставки коворкингов
+WITH loc_mira AS (
+    SELECT id FROM locations WHERE name = 'Офис на Мира'
 ),
-     dorm_bashnia AS (
-         SELECT id FROM dormitories WHERE name = 'Башня'
-     ),
-     dorm_ikar AS (
-         SELECT id FROM dormitories WHERE name = 'Икар'
-     ),
-     dorm_alfa AS (
-         SELECT id FROM dormitories WHERE name = 'Альфа'
+     loc_pavlova AS (
+         SELECT id FROM locations WHERE name = 'Коворкинг на Павлова'
      )
-INSERT INTO machines (dormitory_id, machine_type_id, name)
+INSERT INTO coworkings (location_id, coworking_type_id, name)
 VALUES
-    -- Общежитие "Морг"
-    ((SELECT id FROM dorm_morg), 1, 'Стиральная машина 1 Морг'),
-    ((SELECT id FROM dorm_morg), 2, 'Сушильная машина 2 Морг'),
+    -- Локация «Офис на Мира»
+    ((SELECT id FROM loc_mira), 1, 'Open Space #1'),
+    ((SELECT id FROM loc_mira), 2, 'Meeting Room #2'),
 
-    -- Общежитие "Башня"
-    ((SELECT id FROM dorm_bashnia), 1, 'Стиральная машина 1 Башня'),
-    ((SELECT id FROM dorm_bashnia), 2, 'Сушильная машина 2 Башня')
-
+    -- Локация «Коворкинг на Павлова»
+    ((SELECT id FROM loc_pavlova), 1, 'Open Space #1'),
+    ((SELECT id FROM loc_pavlova), 2, 'Negotiation Room #2')
 ON CONFLICT DO NOTHING;

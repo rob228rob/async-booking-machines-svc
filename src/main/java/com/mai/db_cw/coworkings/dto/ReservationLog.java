@@ -1,4 +1,4 @@
-package com.mai.db_cw.machines.dto;
+package com.mai.db_cw.coworkings.dto;
 
 import lombok.Builder;
 import lombok.Data;

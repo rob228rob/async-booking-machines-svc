@@ -1,4 +1,4 @@
-package com.mai.db_cw.dormitory;
+package com.mai.db_cw.location;
 
 import com.mai.db_cw.infrastructure.exceptions.ApplicationException;
 import com.mai.db_cw.infrastructure.operation_storage.OperationStorage;
@@ -20,21 +20,21 @@ import java.util.UUID;
 @Slf4j
 @Repository
 @RequiredArgsConstructor
-public class DormitoryRepository {
+public class LocationRepository {
 
     private final NamedParameterJdbcTemplate jdbcTemplate;
     private final OperationStorage operationStorage;
 
-    private static final RowMapper<Dormitory> dormitoryRowMapper = (rs, i) ->
-            Dormitory.builder()
+    private static final RowMapper<Location> dormitoryRowMapper = (rs, i) ->
+            Location.builder()
                     .id(UUID.fromString(rs.getString("id")))
                     .address(rs.getString("address"))
                     .name(rs.getString("name"))
                     .creationTime(rs.getTimestamp("creation_time").toLocalDateTime())
                     .build();
 
-    public Optional<Dormitory> findDormitoryById(UUID dormitoryId) {
-        String sql = "select * from dormitories where id = :dormitoryId";
+    public Optional<Location> findDormitoryById(UUID dormitoryId) {
+        String sql = "select * from locations where id = :dormitoryId";
         MapSqlParameterSource params = new MapSqlParameterSource()
                 .addValue("dormitoryId", dormitoryId);
 
@@ -47,12 +47,12 @@ public class DormitoryRepository {
      * @param limit
      * @return
      */
-    public List<Dormitory> findAll(int limit) {
+    public List<Location> findAll(int limit) {
         if (limit <= 0) {
             return Collections.emptyList();
         }
 
-        String sql = "select * from dormitories order by creation_time desc limit :limit";
+        String sql = "select * from locations order by creation_time desc limit :limit";
         MapSqlParameterSource params = new MapSqlParameterSource()
                 .addValue("limit", limit);
 
@@ -64,8 +64,8 @@ public class DormitoryRepository {
      *
      * @return
      */
-    public List<Dormitory> findAll() {
-        log.info("find all dormitories method");
+    public List<Location> findAll() {
+        log.info("find all locations method");
         return findAll(10);
     }
 
@@ -73,7 +73,7 @@ public class DormitoryRepository {
     public void deleteAsync(UUID dormId) {
         try {
             log.info("delete dorm with id: {}", dormId);
-            String sql = "delete from dormitories where id = :dormId";
+            String sql = "delete from locations where id = :dormId";
             MapSqlParameterSource params = new MapSqlParameterSource()
                     .addValue("dormId", dormId);
 
@@ -95,9 +95,9 @@ public class DormitoryRepository {
      * @param build
      */
     @Async
-    public void save(Dormitory build) {
+    public void save(Location build) {
         try {
-            String sql = "insert into dormitories (id, name, address) values (:id, :name, :address)";
+            String sql = "insert into locations (id, name, address) values (:id, :name, :address)";
             MapSqlParameterSource params = new MapSqlParameterSource()
                     .addValue("id", build.getId())
                     .addValue("name", build.getName())

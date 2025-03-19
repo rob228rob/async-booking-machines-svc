@@ -126,18 +126,18 @@
 
     <!-- Форма для добавления новой машинки -->
     <h2>Добавить Новую Машинку</h2>
-    <form id="add-machine-form">
+    <form id="add-coworking-form">
         <label for="dormitory">Общежитие:</label>
         <select id="dormitory" name="dormitory" required>
             <option value="">Выберите общежитие</option>
             <!-- Опции будут загружены динамически -->
         </select>
 
-        <label for="machine-name">Название Машинки:</label>
-        <input type="text" id="machine-name" name="machineName" placeholder="Введите название машинки" required>
+        <label for="coworking-name">Название Машинки:</label>
+        <input type="text" id="coworking-name" name="machineName" placeholder="Введите название машинки" required>
 
-        <label for="machine-type">Тип Машинки:</label>
-        <select id="machine-type" name="machineType" required>
+        <label for="coworking-type">Тип Машинки:</label>
+        <select id="coworking-type" name="machineType" required>
             <option value="">Выберите тип машинки</option>
             <option value="1">Стиральная Машинка (WASHER)</option>
             <option value="2">Сушильная Машинка (DRYER)</option>
@@ -151,7 +151,7 @@
     <!-- Секция для отображения списка машинок -->
     <div class="list-section">
         <h2>Список Машинок</h2>
-        <table id="machines-table">
+        <table id="coworkings-table">
             <thead>
             <tr>
                 <th>ID Машинки</th>

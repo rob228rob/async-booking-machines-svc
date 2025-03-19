@@ -1,4 +1,4 @@
-package com.mai.db_cw.dormitory;
+package com.mai.db_cw.location;
 
 import com.mai.db_cw.infrastructure.operation_storage.OperationStorage;
 import lombok.RequiredArgsConstructor;
@@ -17,23 +17,23 @@ import static com.mai.db_cw.infrastructure.utility.OperationUtility.responseEnti
 @RestController
 @RequestMapping("/api/dorm")
 @RequiredArgsConstructor
-public class DormController {
+public class LocationController {
 
-    private final DormitoryRepository dormitoryRepository;
+    private final LocationRepository locationRepository;
     private final OperationStorage operationStorage;
 
     @GetMapping("/get-all")
-    public ResponseEntity<List<Dormitory>> getAllDormitories() {
+    public ResponseEntity<List<Location>> getAllDormitories() {
         return ResponseEntity
                 .ok()
-                .body(dormitoryRepository.findAll());
+                .body(locationRepository.findAll());
     }
 
     @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/del/{dormId}")
     public ResponseEntity<UUID> delDormitories(@PathVariable UUID dormId) {
         operationStorage.addOperation(dormId);
-        dormitoryRepository.deleteAsync(dormId);
+        locationRepository.deleteAsync(dormId);
 
         return ResponseEntity
                 .status(HttpStatus.ACCEPTED)
@@ -46,7 +46,7 @@ public class DormController {
             @RequestParam String name,
             @RequestParam String address) {
         UUID randomId = operationStorage.addOperationReturningUUID();
-        dormitoryRepository.save(Dormitory
+        locationRepository.save(Location
                 .builder()
                 .id(randomId)
                 .name(name)

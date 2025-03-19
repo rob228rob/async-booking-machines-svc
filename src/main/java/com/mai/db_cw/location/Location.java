@@ -1,4 +1,4 @@
-package com.mai.db_cw.dormitory;
+package com.mai.db_cw.location;
 
 import lombok.Builder;
 import lombok.Data;
@@ -8,7 +8,7 @@ import java.util.UUID;
 
 @Data
 @Builder
-public class Dormitory {
+public class Location {
     private UUID id;
     private String name;
     private String address;

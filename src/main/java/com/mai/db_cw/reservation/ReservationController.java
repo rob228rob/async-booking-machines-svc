@@ -2,7 +2,7 @@ package com.mai.db_cw.reservation;
 
 import com.mai.db_cw.infrastructure.operation_storage.OperationStorage;
 import com.mai.db_cw.infrastructure.utility.OperationUtility;
-import com.mai.db_cw.machines.dto.ReservationLog;
+import com.mai.db_cw.coworkings.dto.ReservationLog;
 import com.mai.db_cw.reservation.dao.ReservationRepository;
 import com.mai.db_cw.reservation.dto.ReservationRequest;
 import com.mai.db_cw.reservation.dto.ReservationUserResponse;

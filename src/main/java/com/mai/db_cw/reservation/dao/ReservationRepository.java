@@ -1,7 +1,7 @@
 package com.mai.db_cw.reservation.dao;
 import com.mai.db_cw.infrastructure.exceptions.ApplicationException;
 import com.mai.db_cw.infrastructure.operation_storage.OperationStorage;
-import com.mai.db_cw.machines.dto.ReservationLog;
+import com.mai.db_cw.coworkings.dto.ReservationLog;
 import com.mai.db_cw.reservation.Reservation;
 import com.mai.db_cw.reservation.dto.ReservationUserResponse;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -32,7 +32,7 @@ public class ReservationRepository {
     private static final RowMapper<Reservation> reservationRowMapper = (rs, cnt) -> Reservation.builder()
             .id(rs.getObject("id", UUID.class))
             .userId(rs.getObject("user_id", UUID.class))
-            .machineId(rs.getObject("machine_id", UUID.class))
+            .coworkingId(rs.getObject("coworking_id", UUID.class))
             .resDate(rs.getDate("res_date").toLocalDate())
             .startTime(rs.getObject("start_time", LocalTime.class))
             .endTime(rs.getObject("end_time", LocalTime.class))
@@ -62,13 +62,13 @@ public class ReservationRepository {
      */
     public void save(Reservation reservation) {
         String sql = "INSERT INTO reservations " +
-                "(id, user_id, machine_id, res_date, start_time, end_time, status, creation_time, modified_time) " +
-                "VALUES (:id, :userId, :machineId, :resDate, :startTime, :endTime, :status, :creationTime, :modifiedTime)";
+                "(id, user_id, coworking_id, res_date, start_time, end_time, status, creation_time, modified_time) " +
+                "VALUES (:id, :userId, :coworkingId, :resDate, :startTime, :endTime, :status, :creationTime, :modifiedTime)";
 
         MapSqlParameterSource params = new MapSqlParameterSource()
                 .addValue("id", reservation.getId())
                 .addValue("userId", reservation.getUserId())
-                .addValue("machineId", reservation.getMachineId())
+                .addValue("coworkingId", reservation.getCoworkingId())
                 .addValue("resDate", reservation.getResDate())
                 .addValue("startTime", reservation.getStartTime())
                 .addValue("endTime", reservation.getEndTime())
@@ -122,9 +122,9 @@ public class ReservationRepository {
         String sql = """
                 SELECT 
                     r.id AS reservation_id,
-                    m.id AS machine_id,
-                    m.name AS machine_name,
-                    d.name AS dormitory_name,
+                    m.id AS coworking_id,
+                    m.name AS coworking_name,
+                    d.name AS location_name,
                     r.res_date,
                     r.start_time,
                     r.end_time,
@@ -134,9 +134,9 @@ public class ReservationRepository {
                 FROM 
                     reservations r
                 JOIN 
-                    machines m ON r.machine_id = m.id
+                    coworkings m ON r.machine_id = m.id
                 JOIN 
-                    dormitories d ON m.dormitory_id = d.id
+                    locations d ON m.dormitory_id = d.id
                 WHERE 
                     r.user_id = :userId
                 ORDER BY 
@@ -154,19 +154,19 @@ public class ReservationRepository {
     /**
      * Поиск бронирований для машинки в указанном периоде
      *
-     * @param machineId UUID идентификатор машинки
+     * @param coworkingId UUID идентификатор машинки
      * @param startDate начальная дата
      * @param endDate   конечная дата
      * @return список бронирований
      */
-    public List<Reservation> findReservationsForMachineInPeriod(UUID machineId, LocalDate startDate, LocalDate endDate) {
+    public List<Reservation> findReservationsForMachineInPeriod(UUID coworkingId, LocalDate startDate, LocalDate endDate) {
         String sql = "SELECT * FROM reservations " +
-                "WHERE machine_id = :machineId " +
+                "WHERE coworking_id = :coworkingId " +
                 "AND res_date >= :startDate " +
                 "AND res_date <= :endDate";
 
         Map<String, Object> params = new HashMap<>();
-        params.put("machineId", machineId);
+        params.put("coworkingId", coworkingId);
         params.put("startDate", startDate);
         params.put("endDate", endDate);
 

@@ -1,7 +1,5 @@
-package com.mai.db_cw.machine_time_slots;
-import com.mai.db_cw.machines.Machine;
+package com.mai.db_cw.coworking_time_slots;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;

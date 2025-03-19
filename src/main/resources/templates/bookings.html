@@ -140,14 +140,14 @@
             cursor: default;
             color: #666;
         }
-        .machines-container {
+        .coworkings-container {
             display: flex;
             flex-wrap: wrap;
             gap: 20px;
             justify-content: center;
         }
 
-        .machine-card {
+        .coworking-card {
             border: 1px solid #ddd;
             border-radius: 8px;
             padding: 16px;
@@ -159,17 +159,17 @@
             transition: transform 0.2s, box-shadow 0.2s;
         }
 
-        .machine-card:hover {
+        .coworking-card:hover {
             transform: translateY(-5px);
             box-shadow: 0 4px 10px rgba(0,0,0,0.2);
         }
 
-        .machine-card h3 {
+        .coworking-card h3 {
             margin-top: 0;
             font-size: 20px;
         }
 
-        .machine-card p {
+        .coworking-card p {
             margin: 5px 0;
             font-size: 14px;
         }
@@ -233,7 +233,7 @@
 <div class="content">
 
     <h2>Выберите машинку для просмотра слотов</h2>
-    <div class="machines-container" id="machines-list">
+    <div class="coworkings-container" id="coworkings-list">
         <!-- Машинки будут загружены сюда -->
     </div>
 
@@ -252,7 +252,7 @@
         <button id="load-slots-button">Загрузить слоты</button>
     </div>
 
-    <div class="slots-container" id="machines-container">
+    <div class="slots-container" id="coworkings-container">
         <!-- Сгенерированные слоты для выбранной машинки будут отображаться здесь -->
     </div>
 </div>

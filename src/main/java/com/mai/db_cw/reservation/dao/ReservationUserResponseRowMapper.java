@@ -15,9 +15,9 @@ public class ReservationUserResponseRowMapper implements RowMapper<ReservationUs
     @Override
     public ReservationUserResponse mapRow(ResultSet rs, int rowNum) throws SQLException {
         UUID reservationId = rs.getObject("reservation_id", UUID.class);
-        UUID machineId = rs.getObject("machine_id", UUID.class);
-        String machineName = rs.getString("machine_name");
-        String dormitoryName = rs.getString("dormitory_name");
+        UUID machineId = rs.getObject("coworking_id", UUID.class);
+        String machineName = rs.getString("coworking_name");
+        String dormitoryName = rs.getString("location_name");
         // временно откажемся от дня недели
 //        int dayOfWeekInt = rs.getInt("day_of_week");
 //        String dayOfWeek = getDayOfWeek(dayOfWeekInt);

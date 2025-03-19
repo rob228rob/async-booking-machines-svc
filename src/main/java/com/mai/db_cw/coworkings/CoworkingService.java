@@ -1,10 +1,10 @@
-package com.mai.db_cw.machines;
+package com.mai.db_cw.coworkings;
 
 import com.mai.db_cw.infrastructure.exceptions.ApplicationException;
 import com.mai.db_cw.infrastructure.operation_storage.OperationStorage;
-import com.mai.db_cw.machines.dao.MachineRepository;
-import com.mai.db_cw.machines.dto.MachineRequest;
-import com.mai.db_cw.machines.dto.MachineResponse;
+import com.mai.db_cw.coworkings.dao.CoworkingRepository;
+import com.mai.db_cw.coworkings.dto.CoworkingRequest;
+import com.mai.db_cw.coworkings.dto.CoworkingResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -19,17 +19,17 @@ import static com.mai.db_cw.infrastructure.utility.ExceptionUtility.throwIfAnyOb
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class MachineService {
+public class CoworkingService {
 
-    private final MachineRepository machineDao;
+    private final CoworkingRepository machineDao;
     private final OperationStorage operationStorage;
 
-    public void saveMachine(Machine machine) {
-        machineDao.saveMachine(machine);
+    public void saveMachine(Coworking coworking) {
+        machineDao.saveMachine(coworking);
     }
 
-    public List<MachineResponse> findAllMachines() {
-        List<MachineResponse> machines = machineDao.findAllMachinesReturningDto();
+    public List<CoworkingResponse> findAllMachines() {
+        List<CoworkingResponse> machines = machineDao.findAllMachinesReturningDto();
         if (machines.isEmpty()) {
             log.error("No machines found");
             return Collections.emptyList();
@@ -38,7 +38,7 @@ public class MachineService {
         return machines;
     }
 
-    public Optional<Machine> findById(UUID machineId) {
+    public Optional<Coworking> findById(UUID machineId) {
         return machineDao.findMachineById(machineId);
     }
 
@@ -46,23 +46,23 @@ public class MachineService {
      * асинхронное создание машинки
      *
      * @param randomId
-     * @param machineRequest
+     * @param coworkingRequest
      */
     @Async
-    public void runAsyncCreateMachine(UUID randomId, MachineRequest machineRequest) {
+    public void runAsyncCreateMachine(UUID randomId, CoworkingRequest coworkingRequest) {
         try {
-            throwIfAnyObjectIsNull("Invalid args", randomId, machineRequest);
+            throwIfAnyObjectIsNull("Invalid args", randomId, coworkingRequest);
 
 
-            Machine machine = Machine.builder()
+            Coworking coworking = Coworking.builder()
                     .id(randomId)
-                    .name(machineRequest.name())
-                    .machineTypeId(machineRequest.type())
-                    .dormitoryId(machineRequest.dormitoryId())
+                    .name(coworkingRequest.name())
+                    .machineTypeId(coworkingRequest.type())
+                    .dormitoryId(coworkingRequest.dormitoryId())
                     .build();
 
             log.info("Async operation status: request sent to psql: id - {}", randomId);
-            machineDao.saveMachine(machine);
+            machineDao.saveMachine(coworking);
             operationStorage.successfully(randomId);
         } catch (ApplicationException e) {
             operationStorage.failOperation(randomId, e.getMessage(), e.getHttpStatus());
