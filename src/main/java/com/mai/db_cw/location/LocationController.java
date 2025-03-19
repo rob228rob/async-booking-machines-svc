@@ -15,7 +15,7 @@ import static com.mai.db_cw.infrastructure.utility.OperationUtility.responseEnti
 
 @Slf4j
 @RestController
-@RequestMapping("/api/dorm")
+@RequestMapping("/api/location")
 @RequiredArgsConstructor
 public class LocationController {
 
@@ -55,7 +55,7 @@ public class LocationController {
 
         return ResponseEntity
                 .status(HttpStatus.ACCEPTED)
-                .header("Location", "/api/dorm/status/" + randomId.toString())
+                .header("Location", "/api/location/status/" + randomId.toString())
                 .body(randomId);
     }
 

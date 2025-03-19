@@ -33,7 +33,7 @@ document.addEventListener('DOMContentLoaded', async () => {
  */
 async function fetchDormitories() {
     try {
-        const response = await fetch('/api/dorm/get-all', {
+        const response = await fetch('/api/location/get-all', {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json'
@@ -207,7 +207,7 @@ async function handleAddDormitory(event) {
     };
 
     try {
-        const response = await fetch('/api/dorm/add', {
+        const response = await fetch('/api/location/add', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded'
@@ -434,15 +434,15 @@ async function handleAddMachine(event) {
  * @param {Event} event - Событие клика на кнопке удаления
  */
 async function handleDeleteDormitory(event) {
-    const dormId = event.target.getAttribute('data-dorm-id');
-    if (!dormId) return;
+    const locationId = event.target.getAttribute('data-dorm-id');
+    if (!locationId) return;
 
     // Подтверждение действия
     const confirmDelete = confirm('Вы уверены, что хотите удалить это общежитие? Это действие нельзя отменить.');
     if (!confirmDelete) return;
 
     try {
-        const response = await fetch(`/api/dorm/del/${dormId}`, {
+        const response = await fetch(`/api/location/del/${locationId}`, {
             method: 'DELETE',
             headers: {
                 'Content-Type': 'application/json'
