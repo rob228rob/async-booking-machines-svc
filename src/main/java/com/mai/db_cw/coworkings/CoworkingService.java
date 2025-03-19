@@ -21,48 +21,47 @@ import static com.mai.db_cw.infrastructure.utility.ExceptionUtility.throwIfAnyOb
 @RequiredArgsConstructor
 public class CoworkingService {
 
-    private final CoworkingRepository machineDao;
+    private final CoworkingRepository coworkingRepository;
     private final OperationStorage operationStorage;
 
-    public void saveMachine(Coworking coworking) {
-        machineDao.saveMachine(coworking);
+    public void saveCoworking(Coworking coworking) {
+        coworkingRepository.saveCoworking(coworking);
     }
 
-    public List<CoworkingResponse> findAllMachines() {
-        List<CoworkingResponse> machines = machineDao.findAllMachinesReturningDto();
-        if (machines.isEmpty()) {
-            log.error("No machines found");
+    public List<CoworkingResponse> findAllCoworkings() {
+        List<CoworkingResponse> coworkings = coworkingRepository.findAllCoworkingsReturningDto();
+        if (coworkings.isEmpty()) {
+            log.error("No coworkings found");
             return Collections.emptyList();
         }
-
-        return machines;
+        return coworkings;
     }
 
-    public Optional<Coworking> findById(UUID machineId) {
-        return machineDao.findMachineById(machineId);
+    public Optional<Coworking> findById(UUID coworkingId) {
+        return coworkingRepository.findCoworkingById(coworkingId);
     }
 
     /**
-     * асинхронное создание машинки
+     * Асинхронное создание коворкинга
      *
-     * @param randomId
-     * @param coworkingRequest
+     * @param randomId         – Идентификатор коворкинга
+     * @param coworkingRequest – DTO с данными для создания
      */
     @Async
-    public void runAsyncCreateMachine(UUID randomId, CoworkingRequest coworkingRequest) {
+    public void runAsyncCreateCoworking(UUID randomId, CoworkingRequest coworkingRequest) {
         try {
             throwIfAnyObjectIsNull("Invalid args", randomId, coworkingRequest);
-
 
             Coworking coworking = Coworking.builder()
                     .id(randomId)
                     .name(coworkingRequest.name())
-                    .machineTypeId(coworkingRequest.type())
-                    .dormitoryId(coworkingRequest.dormitoryId())
+                    .coworkingTypeId(coworkingRequest.type())
+                    // Если в CoworkingRequest поле всё ещё называется dormitoryId(), нужно переименовать
+                    .locationId(coworkingRequest.dormitoryId())
                     .build();
 
             log.info("Async operation status: request sent to psql: id - {}", randomId);
-            machineDao.saveMachine(coworking);
+            coworkingRepository.saveCoworking(coworking);
             operationStorage.successfully(randomId);
         } catch (ApplicationException e) {
             operationStorage.failOperation(randomId, e.getMessage(), e.getHttpStatus());
@@ -74,18 +73,17 @@ public class CoworkingService {
     }
 
     @Async
-    public void deleteAsyncById(UUID machineId) {
+    public void deleteAsyncById(UUID coworkingId) {
         try {
-            log.info("delete async operation status: id - {}", machineId);
-            machineDao.deleteMachineById(machineId);
-            operationStorage.successfully(machineId);
+            log.info("Delete async operation status: id - {}", coworkingId);
+            coworkingRepository.deleteCoworkingById(coworkingId);
+            operationStorage.successfully(coworkingId);
         } catch (ApplicationException e) {
-            operationStorage.failOperation(machineId, e.getMessage(), e.getHttpStatus());
+            operationStorage.failOperation(coworkingId, e.getMessage(), e.getHttpStatus());
         } catch (DataIntegrityViolationException e) {
-            operationStorage.failOperation(machineId, e.getMessage(), HttpStatus.CONFLICT);
+            operationStorage.failOperation(coworkingId, e.getMessage(), HttpStatus.CONFLICT);
         } catch (RuntimeException e) {
-            operationStorage.failOperation(machineId, e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+            operationStorage.failOperation(coworkingId, e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 }
-

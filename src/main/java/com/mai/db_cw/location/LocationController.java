@@ -45,6 +45,7 @@ public class LocationController {
     public ResponseEntity<UUID> addNewDormitory(
             @RequestParam String name,
             @RequestParam String address) {
+        log.info("new add, name : {}, address : {}", name, address);
         UUID randomId = operationStorage.addOperationReturningUUID();
         locationRepository.save(Location
                 .builder()

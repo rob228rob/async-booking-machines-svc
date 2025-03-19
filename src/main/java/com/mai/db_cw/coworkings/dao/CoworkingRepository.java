@@ -16,13 +16,14 @@ public class CoworkingRepository {
 
     private final NamedParameterJdbcTemplate jdbcTemplate;
 
-    private static class MachineRowMapper implements RowMapper<Coworking> {
+    // Переименован из MachineRowMapper
+    private static class CoworkingRowMapper implements RowMapper<Coworking> {
         @Override
         public Coworking mapRow(java.sql.ResultSet rs, int rowNum) throws java.sql.SQLException {
             return Coworking.builder()
                     .id(rs.getObject("id", UUID.class))
-                    .dormitoryId(rs.getObject("dormitory_id", UUID.class))
-                    .machineTypeId(rs.getInt("machine_type_id"))
+                    .locationId(rs.getObject("location_id", UUID.class))          // Было dormitoryId
+                    .coworkingTypeId(rs.getInt("coworking_type_id"))              // Было machineTypeId
                     .name(rs.getString("name"))
                     .creationTime(rs.getTimestamp("creation_time").toLocalDateTime())
                     .modifiedTime(rs.getTimestamp("modified_time").toLocalDateTime())
@@ -30,59 +31,62 @@ public class CoworkingRepository {
         }
     }
 
-    public void saveMachine(Coworking coworking) {
-        String sql = "INSERT INTO machines (id, dormitory_id, machine_type_id, name) " +
-                "VALUES (:id, :dormitoryId, :machineTypeId, :name)";
+    // Переименован из saveMachine
+    public void saveCoworking(Coworking coworking) {
+        String sql = "INSERT INTO coworkings (id, location_id, coworking_type_id, name) " +
+                "VALUES (:id, :locationId, :coworkingTypeId, :name)";
 
         MapSqlParameterSource params = new MapSqlParameterSource()
                 .addValue("id", coworking.getId())
-                .addValue("dormitoryId", coworking.getDormitoryId())
-                .addValue("machineTypeId", coworking.getMachineTypeId())
+                .addValue("locationId", coworking.getLocationId())
+                .addValue("coworkingTypeId", coworking.getCoworkingTypeId())
                 .addValue("name", coworking.getName());
 
         jdbcTemplate.update(sql, params);
     }
 
-    public void deleteMachineById(UUID id) {
-        String sql = "DELETE FROM machines WHERE id = :id";
+    // Переименован из deleteMachineById
+    public void deleteCoworkingById(UUID id) {
+        String sql = "DELETE FROM coworkings WHERE id = :id";
 
         MapSqlParameterSource params = new MapSqlParameterSource().addValue("id", id);
         jdbcTemplate.update(sql, params);
     }
 
-    public Optional<Coworking> findMachineById(UUID id) {
-        String sql = "SELECT * FROM machines WHERE id = :id";
+    // Переименован из findMachineById
+    public Optional<Coworking> findCoworkingById(UUID id) {
+        String sql = "SELECT * FROM coworkings WHERE id = :id";
         MapSqlParameterSource params = new MapSqlParameterSource().addValue("id", id);
 
-        return jdbcTemplate.query(sql, params, new MachineRowMapper()).stream().findFirst();
+        return jdbcTemplate.query(sql, params, new CoworkingRowMapper()).stream().findFirst();
     }
 
+    // Переименован из findAllMachines
+    public List<Coworking> findAllCoworkings() {
+        String sql = "SELECT * FROM coworkings";
 
-    public List<Coworking> findAllMachines() {
-        String sql = "select * from machines";
-
-        return jdbcTemplate.query(sql, new MachineRowMapper()).stream().toList();
+        return jdbcTemplate.query(sql, new CoworkingRowMapper()).stream().toList();
     }
 
-    public List<CoworkingResponse> findAllMachinesReturningDto() {
+    // Переименован из findAllMachinesReturningDto
+    public List<CoworkingResponse> findAllCoworkingsReturningDto() {
         String sql = "SELECT " +
-                "m.id AS machine_id, " +
-                "m.name AS machine_name, " +
-                "d.name AS dormitory_name, " +
-                "mt.name AS machine_type_name " +
-                "FROM machines m " +
-                "LEFT JOIN machine_types mt ON mt.id = m.machine_type_id " +
-                "LEFT JOIN dormitories d ON d.id = m.dormitory_id";
+                "c.id AS coworking_id, " +
+                "c.name AS coworking_name, " +
+                "l.name AS location_name, " +
+                "ct.name AS coworking_type_name " +
+                "FROM coworkings c " +
+                "LEFT JOIN coworking_types ct ON ct.id = c.coworking_type_id " +
+                "LEFT JOIN locations l ON l.id = c.location_id";
 
         Map<String, Object> params = new HashMap<>();
 
-        return jdbcTemplate.query(sql, params, (rs, cnt) -> {
-            return CoworkingResponse.builder()
-                    .id(UUID.fromString(rs.getString("machine_id")))
-                    .name(rs.getString("machine_name"))
-                    .dormitoryName(rs.getString("dormitory_name"))
-                    .machineType(rs.getString("machine_type_name"))
-                    .build();
-        });
+        return jdbcTemplate.query(sql, params, (rs, cnt) -> CoworkingResponse.builder()
+                .id(UUID.fromString(rs.getString("coworking_id")))
+                .name(rs.getString("coworking_name"))
+                .locationName(rs.getString("location_name"))        // Было dormitoryName
+                .coworkingType(rs.getString("coworking_type_name")) // Было machineType
+                .build()
+        );
     }
 }

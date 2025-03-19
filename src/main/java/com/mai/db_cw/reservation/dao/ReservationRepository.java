@@ -1,4 +1,5 @@
 package com.mai.db_cw.reservation.dao;
+
 import com.mai.db_cw.infrastructure.exceptions.ApplicationException;
 import com.mai.db_cw.infrastructure.operation_storage.OperationStorage;
 import com.mai.db_cw.coworkings.dto.ReservationLog;
@@ -40,6 +41,7 @@ public class ReservationRepository {
             .creationTime(rs.getTimestamp("creation_time").toLocalDateTime())
             .modifiedTime(rs.getTimestamp("modified_time").toLocalDateTime())
             .build();
+
     private final OperationStorage operationStorage;
 
     /**
@@ -101,6 +103,7 @@ public class ReservationRepository {
      * @param newStatus     новый статус
      */
     public void updateReservationStatus(UUID reservationId, String newStatus) {
+        // Используется существующая процедура
         String sql = "CALL update_reservation_status(:res_id, :new_status)";
 
         MapSqlParameterSource params = new MapSqlParameterSource()
@@ -122,9 +125,9 @@ public class ReservationRepository {
         String sql = """
                 SELECT 
                     r.id AS reservation_id,
-                    m.id AS coworking_id,
-                    m.name AS coworking_name,
-                    d.name AS location_name,
+                    c.id AS coworking_id,
+                    c.name AS coworking_name,
+                    l.name AS location_name,
                     r.res_date,
                     r.start_time,
                     r.end_time,
@@ -134,9 +137,9 @@ public class ReservationRepository {
                 FROM 
                     reservations r
                 JOIN 
-                    coworkings m ON r.machine_id = m.id
+                    coworkings c ON r.coworking_id = c.id
                 JOIN 
-                    locations d ON m.dormitory_id = d.id
+                    locations l ON c.location_id = l.id
                 WHERE 
                     r.user_id = :userId
                 ORDER BY 
@@ -152,14 +155,14 @@ public class ReservationRepository {
     }
 
     /**
-     * Поиск бронирований для машинки в указанном периоде
+     * Поиск бронирований для коворкинга в указанном периоде
      *
-     * @param coworkingId UUID идентификатор машинки
-     * @param startDate начальная дата
-     * @param endDate   конечная дата
+     * @param coworkingId UUID идентификатор коворкинга
+     * @param startDate   начальная дата
+     * @param endDate     конечная дата
      * @return список бронирований
      */
-    public List<Reservation> findReservationsForMachineInPeriod(UUID coworkingId, LocalDate startDate, LocalDate endDate) {
+    public List<Reservation> findReservationsForCoworkingInPeriod(UUID coworkingId, LocalDate startDate, LocalDate endDate) {
         String sql = "SELECT * FROM reservations " +
                 "WHERE coworking_id = :coworkingId " +
                 "AND res_date >= :startDate " +
@@ -173,6 +176,12 @@ public class ReservationRepository {
         return jdbcTemplate.query(sql, params, reservationRowMapper);
     }
 
+    /**
+     * Получение логов бронирований (с ограничением limit)
+     *
+     * @param limit максимальное кол-во записей
+     * @return список ReservationLog
+     */
     public List<ReservationLog> findReservationLogs(long limit) {
         String sql = "SELECT * FROM reservation_logs ORDER BY action_time DESC LIMIT :limit";
         MapSqlParameterSource params = new MapSqlParameterSource()
@@ -193,12 +202,15 @@ public class ReservationRepository {
         return query;
     }
 
-
+    /**
+     * Асинхронное удаление бронирования
+     *
+     * @param reservationId UUID идентификатор бронирования
+     */
     @Async
     public void deleteReservationById(UUID reservationId) {
         try {
-            String sql = "delete from reservations where id = :id";
-
+            String sql = "DELETE FROM reservations WHERE id = :id";
             MapSqlParameterSource params = new MapSqlParameterSource()
                     .addValue("id", reservationId);
 
@@ -213,14 +225,29 @@ public class ReservationRepository {
         }
     }
 
+    /**
+     * Подсчет всех бронирований
+     *
+     * @return кол-во записей в таблице reservations
+     */
     public int count() {
-        String sql = "select count(id) as cnt from reservations";
-        return jdbcTemplate.query(sql, Collections.emptyMap(), (rs, c) -> rs.getInt("cnt")).stream().findFirst().orElse(0);
+        String sql = "SELECT COUNT(id) AS cnt FROM reservations";
+        return jdbcTemplate.query(sql, Collections.emptyMap(), (rs, c) -> rs.getInt("cnt"))
+                .stream()
+                .findFirst()
+                .orElse(0);
     }
 
+    /**
+     * Поиск всех бронирований со статусами ACTIVE или PENDING
+     *
+     * @return список бронирований
+     */
     public List<Reservation> findAll() {
-        String sql = "select * from reservations where status like '%ACTIVE%' or status like '%PENDING% " +
-                "order by creation_time desc'";
+        String sql = "SELECT * FROM reservations " +
+                "WHERE status LIKE '%ACTIVE%' " +
+                "OR status LIKE '%PENDING%' " +
+                "ORDER BY creation_time DESC";
         return jdbcTemplate.query(sql, reservationRowMapper);
     }
 
@@ -232,7 +259,7 @@ public class ReservationRepository {
     public void updateStatus(Reservation reservation) {
         String sql = "UPDATE reservations " +
                 "SET status = :status, " +
-                "modified_time = :modifiedTime " +
+                "    modified_time = :modifiedTime " +
                 "WHERE id = :id";
 
         MapSqlParameterSource params = new MapSqlParameterSource()

@@ -31,7 +31,7 @@ public class CoworkingController {
     @GetMapping("/get-all")
     public ResponseEntity<List<CoworkingResponse>> getAllMachines() {
         return ResponseEntity
-                .ok(coworkingService.findAllMachines());
+                .ok(coworkingService.findAllCoworkings());
     }
 
     /**
@@ -45,7 +45,7 @@ public class CoworkingController {
     @PostMapping("/add")
     public ResponseEntity<UUID> addMachine(@RequestBody CoworkingRequest coworkingRequest) {
         UUID randomId = operationStorage.addOperationReturningUUID();
-        coworkingService.runAsyncCreateMachine(randomId, coworkingRequest);
+        coworkingService.runAsyncCreateCoworking(randomId, coworkingRequest);
 
         return ResponseEntity
                 .status(HttpStatus.ACCEPTED)

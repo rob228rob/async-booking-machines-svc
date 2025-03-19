@@ -41,7 +41,7 @@ async function fetchDormitories() {
             credentials: 'include'
         });
 
-        if (response.ok) {
+        if (response.ok || response.status === 202) {
             const dormitories = await response.json();
             populateDormitorySelect(dormitories);
             populateDormitoriesTable(dormitories);

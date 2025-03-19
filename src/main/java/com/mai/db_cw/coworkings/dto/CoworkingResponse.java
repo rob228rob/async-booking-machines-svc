@@ -10,6 +10,6 @@ import java.util.UUID;
 public class CoworkingResponse {
     private UUID id;
     private String name;
-    private String dormitoryName;
-    private String machineType;
+    private String locationName;
+    private String coworkingType;
 }

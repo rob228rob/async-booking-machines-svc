@@ -31,8 +31,8 @@ spring:
       initialize-schema: always
 
   liquibase:
-    # врубать тру только если хочется валидировать изменение схемы
-    enabled: false
+    # врубать тру только если хочется валидировать изменение схемы или ПРИ ПЕРВОМ запуске
+    enabled: true
     change-log: classpath:db/changelog/db.changelog-master.yaml
 
 server:

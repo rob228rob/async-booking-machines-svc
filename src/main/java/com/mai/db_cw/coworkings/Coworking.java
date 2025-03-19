@@ -10,8 +10,8 @@ import java.util.UUID;
 @Data
 public class Coworking {
     private UUID id;
-    private UUID dormitoryId;
-    private Integer machineTypeId;
+    private UUID locationId;
+    private Integer coworkingTypeId;
     private String name;
     private LocalDateTime creationTime;
     private LocalDateTime modifiedTime;

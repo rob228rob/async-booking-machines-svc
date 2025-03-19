@@ -4,7 +4,6 @@ import com.mai.db_cw.infrastructure.exceptions.ApplicationException;
 import com.mai.db_cw.infrastructure.exceptions.EntityNotFoundException;
 import com.mai.db_cw.infrastructure.exceptions.InvalidUserInfoException;
 import com.mai.db_cw.infrastructure.operation_storage.OperationStorage;
-import com.mai.db_cw.coworking_time_slots.MachineTimeSlotRepository;
 import com.mai.db_cw.coworkings.Coworking;
 import com.mai.db_cw.coworkings.CoworkingService;
 import com.mai.db_cw.reservation.dao.ReservationRepository;
@@ -33,7 +32,6 @@ import java.util.UUID;
 public class ReservationService {
 
     private final ReservationRepository reservationRepository;
-    private final MachineTimeSlotRepository machineTimeSlotRepository;
     private final UserService userService;
     private final CoworkingService coworkingService;
     private final OperationStorage operationStorage;
@@ -54,7 +52,7 @@ public class ReservationService {
 
             // Проверка доступности слота
             boolean isAvailable = reservationRepository
-                    .findReservationsForMachineInPeriod(request.machineId(), request.resDate(), request.resDate())
+                    .findReservationsForCoworkingInPeriod(request.machineId(), request.resDate(), request.resDate())
                     .stream()
                     .noneMatch(reservation ->
                             (reservation.getStartTime().equals(request.startTime()) && reservation.getEndTime().equals(request.endTime())) ||
@@ -91,25 +89,6 @@ public class ReservationService {
         } catch (RuntimeException e) {
             operationStorage.failOperation(randomId, e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
-    }
-
-    /**
-     * Кидает исключение если уже занят слот
-     * Иначе отмечает в базе статус что слот занят, дабы избежать гонки за один и тот же слот
-     *
-     * @param machineId
-     * @param timeSlotId
-     */
-    private void throwIfReservationAlreadyOccupied(UUID machineId, UUID timeSlotId) {
-        var slot = machineTimeSlotRepository.findByIds(machineId, timeSlotId);
-        if (slot.getIsAvailable()) {
-            log.debug("Slot was occupied successful! Status isAvailable SET to FALSE");
-            machineTimeSlotRepository.updateAvailability(machineId, timeSlotId, false);
-            return;
-        }
-
-        log.error("Slot already occupied; Attempt failed");
-        throw new ApplicationException("Slot already occupied!", HttpStatus.CONFLICT);
     }
 
     public List<Reservation> getAllReservationsByUserId(UUID userId) {

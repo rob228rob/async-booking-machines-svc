@@ -102,7 +102,7 @@ public class LocationRepository {
                     .addValue("id", build.getId())
                     .addValue("name", build.getName())
                     .addValue("address", build.getAddress());
-
+            log.info("saving locations");
             jdbcTemplate.update(sql, params);
             operationStorage.successfully(build.getId());
         } catch (ApplicationException e) {
