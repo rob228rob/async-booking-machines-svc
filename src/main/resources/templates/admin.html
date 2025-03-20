@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Админская панель - Управление Машинками, Общежитиями и Логами</title>
+    <title>Админская панель </title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat+Alternates:wght@400;700&family=Roboto:wght@400;500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/css/admin.css">
     <style>
@@ -110,35 +110,35 @@
 </div>
 
 <div class="admin-container">
-    <!-- Форма для добавления нового общежития -->
-    <h2>Добавить Новое Общежитие</h2>
+    <!-- Форма для добавления нового локации -->
+    <h2>Добавить Новое локация</h2>
     <form id="add-dormitory-form">
-        <label for="dorm-name">Название Общежития:</label>
-        <input type="text" id="dorm-name" name="dormName" placeholder="Введите название общежития" required>
+        <label for="dorm-name">Название локации:</label>
+        <input type="text" id="dorm-name" name="dormName" placeholder="Введите название локации" required>
 
-        <label for="dorm-address">Адрес Общежития:</label>
-        <input type="text" id="dorm-address" name="dormAddress" placeholder="Введите адрес общежития" required>
+        <label for="dorm-address">Адрес локации:</label>
+        <input type="text" id="dorm-address" name="dormAddress" placeholder="Введите адрес локации" required>
 
-        <button type="submit">Добавить Общежитие</button>
+        <button type="submit">Добавить локацию</button>
     </form>
-    <div class="message success" id="dorm-success-message">Общежитие успешно добавлено!</div>
-    <div class="message error" id="dorm-error-message">Ошибка при добавлении общежития. Попробуйте снова.</div>
+    <div class="message success" id="dorm-success-message">Локацияя успешно добавлено!</div>
+    <div class="message error" id="dorm-error-message">Ошибка при добавлении локации. Попробуйте снова.</div>
 
-    <!-- Форма для добавления новой машинки -->
-    <h2>Добавить Новую Машинку</h2>
+    <!-- Форма для добавления новой пространство -->
+    <h2>Добавить Новой простратноство</h2>
     <form id="add-coworking-form">
-        <label for="dormitory">Общежитие:</label>
+        <label for="dormitory">локация:</label>
         <select id="dormitory" name="dormitory" required>
-            <option value="">Выберите общежитие</option>
+            <option value="">Выберите локация</option>
             <!-- Опции будут загружены динамически -->
         </select>
 
-        <label for="coworking-name">Название Машинки:</label>
-        <input type="text" id="coworking-name" name="machineName" placeholder="Введите название машинки" required>
+        <label for="coworking-name">Название Пространства:</label>
+        <input type="text" id="coworking-name" name="machineName" placeholder="Введите название пространство" required>
 
-        <label for="coworking-type">Тип Машинки:</label>
+        <label for="coworking-type">Тип пространство:</label>
         <select id="coworking-type" name="machineType" required>
-            <option value="">Выберите тип машинки</option>
+            <option value="">Выберите тип пространство</option>
             <option value="1">Стиральная Машинка (WASHER)</option>
             <option value="2">Сушильная Машинка (DRYER)</option>
         </select>
@@ -146,7 +146,7 @@
         <button type="submit">Добавить Машинку</button>
     </form>
     <div class="message success" id="success-message">Машинка успешно добавлена!</div>
-    <div class="message error" id="error-message">Ошибка при добавлении машинки. Попробуйте снова.</div>
+    <div class="message error" id="error-message">Ошибка при добавлении пространство. Попробуйте снова.</div>
 
     <!-- Секция для отображения списка машинок -->
     <div class="list-section">
@@ -154,15 +154,15 @@
         <table id="coworkings-table">
             <thead>
             <tr>
-                <th>ID Машинки</th>
+                <th>ID пространство</th>
                 <th>Название</th>
                 <th>Тип</th>
-                <th>Общежитие</th>
+                <th>локация</th>
                 <th>Действия</th>
             </tr>
             </thead>
             <tbody>
-            <!-- Машинки будут загружены сюда динамически -->
+            <!-- пространство будут загружены сюда динамически -->
             </tbody>
         </table>
     </div>
@@ -173,14 +173,14 @@
         <table id="dormitories-table">
             <thead>
             <tr>
-                <th>ID Общежития</th>
+                <th>ID локации</th>
                 <th>Название</th>
                 <th>Адрес</th>
                 <th>Действия</th>
             </tr>
             </thead>
             <tbody>
-            <!-- Общежития будут загружены сюда динамически -->
+            <!-- локации будут загружены сюда динамически -->
             </tbody>
         </table>
     </div>
