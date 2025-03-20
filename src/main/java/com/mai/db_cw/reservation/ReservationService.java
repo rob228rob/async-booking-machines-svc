@@ -47,7 +47,7 @@ public class ReservationService {
                     .orElseThrow(() -> new InvalidUserInfoException("Пользователь не найден"));
 
             Coworking coworking = coworkingService.findById(request.machineId())
-                    .orElseThrow(() -> new EntityNotFoundException("Машинка не найдена"));
+                    .orElseThrow(() -> new EntityNotFoundException("Пространство не найдено"));
 
             // Проверка доступности слота
             boolean isAvailable = reservationRepository

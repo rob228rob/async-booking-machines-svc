@@ -7,11 +7,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     // можно включить сразу загрузку логов, можно не включать
     //await fetchLogs(0);
 
-    // Обработчик отправки формы машинки
+    // Обработчик отправки формы пространства
     const addMachineForm = document.getElementById('add-machine-form');
     addMachineForm.addEventListener('submit', handleAddMachine);
 
-    // Обработчик отправки формы для общежитий
+    // Обработчик отправки формы для локаций
     const addDormitoryForm = document.getElementById('add-dormitory-form');
     addDormitoryForm.addEventListener('submit', handleAddDormitory);
 
@@ -29,7 +29,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 });
 
 /**
- * Функция для получения всех общежитий и заполнения выпадающего списка
+ * Функция для получения всех локаций и заполнения выпадающего списка
  */
 async function fetchDormitories() {
     try {
@@ -46,18 +46,18 @@ async function fetchDormitories() {
             populateDormitorySelect(dormitories);
             populateDormitoriesTable(dormitories);
         } else {
-            console.error('Не удалось получить список общежитий.');
-            showErrorMessage('Не удалось загрузить список общежитий.');
+            console.error('Не удалось получить список локаций.');
+            showErrorMessage('Не удалось загрузить список локаций.');
         }
     } catch (error) {
-        console.error('Ошибка при получении общежитий:', error);
-        showErrorMessage('Произошла ошибка при загрузке общежитий.');
+        console.error('Ошибка при получении локаций:', error);
+        showErrorMessage('Произошла ошибка при загрузке локаций.');
     }
 }
 
 /**
- * Функция для заполнения выпадающего списка общежитий
- * @param {Array} dormitories - Массив общежитий
+ * Функция для заполнения выпадающего списка локаций
+ * @param {Array} dormitories - Массив локаций
  */
 function populateDormitorySelect(dormitories) {
     const dormitorySelect = document.getElementById('dormitory');
@@ -71,8 +71,8 @@ function populateDormitorySelect(dormitories) {
 }
 
 /**
- * Функция для заполнения таблицы общежитий
- * @param {Array} dormitories - Массив общежитий
+ * Функция для заполнения таблицы локаций
+ * @param {Array} dormitories - Массив локаций
  */
 function populateDormitoriesTable(dormitories) {
     const dormitoriesTableBody = document.querySelector('#dormitories-table tbody');
@@ -93,14 +93,14 @@ function populateDormitoriesTable(dormitories) {
         dormitoriesTableBody.appendChild(row);
     });
 
-    // Добавляем обработчики событий для кнопок удаления общежитий
+    // Добавляем обработчики событий для кнопок удаления локаций
     document.querySelectorAll('.delete-button').forEach(button => {
         button.addEventListener('click', handleDeleteDormitory);
     });
 }
 
 /**
- * Функция для получения всех машинок и заполнения таблицы машинок
+ * Функция для получения всех пространств и заполнения таблицы пространств
  */
 async function fetchMachines() {
     try {
@@ -116,18 +116,18 @@ async function fetchMachines() {
             const machines = await response.json();
             populateMachinesTable(machines);
         } else {
-            console.error('Не удалось получить список машинок.');
-            showErrorMessage('Не удалось загрузить список машинок.');
+            console.error('Не удалось получить список пространств.');
+            showErrorMessage('Не удалось загрузить список пространств.');
         }
     } catch (error) {
-        console.error('Ошибка при получении машинок:', error);
-        showErrorMessage('Произошла ошибка при загрузке машинок.');
+        console.error('Ошибка при получении пространств:', error);
+        showErrorMessage('Произошла ошибка при загрузке пространств.');
     }
 }
 
 /**
- * Функция для заполнения таблицы машинок
- * @param {Array} machines - Массив машинок
+ * Функция для заполнения таблицы пространств
+ * @param {Array} machines - Массив пространств
  */
 function populateMachinesTable(machines) {
     const machinesTableBody = document.querySelector('#machines-table tbody');
@@ -150,7 +150,7 @@ function populateMachinesTable(machines) {
         machinesTableBody.appendChild(row);
     });
 
-    // Добавляем обработчики событий для кнопок удаления машинок
+    // Добавляем обработчики событий для кнопок удаления пространств
     document.querySelectorAll('.delete-button').forEach(button => {
         button.addEventListener('click', handleDeleteMachine);
     });
@@ -225,12 +225,12 @@ async function handleAddDormitory(event) {
             pollingAsyncOperationStatus(id, statusUrl, fetchDormitories);
         } else {
             const errorData = await response.text();
-            console.error('Ошибка при добавлении общежития:', errorData);
-            showErrorMessage('Не удалось добавить общежитие. Проверьте данные и попробуйте снова.');
+            console.error('Ошибка при добавлении локации:', errorData);
+            showErrorMessage('Не удалось добавить локацию. Проверьте данные и попробуйте снова.');
         }
     } catch (error) {
-        console.error('Ошибка при добавлении общежития:', error);
-        showErrorMessage('Произошла ошибка при добавлении общежития.');
+        console.error('Ошибка при добавлении локации:', error);
+        showErrorMessage('Произошла ошибка при добавлении локации.');
     }
 }
 
@@ -377,7 +377,7 @@ function populateLogsTable(logs) {
 
 
 /**
- * Обработчик отправки формы для добавления новой машинки
+ * Обработчик отправки формы для добавления новой пространства
  * @param {Event} event - Событие отправки формы
  */
 async function handleAddMachine(event) {
@@ -410,7 +410,7 @@ async function handleAddMachine(event) {
         });
 
         if (response.status === 202) { // HTTP 202 Accepted
-            showSuccessMessage('Машинка успешно добавлена!');
+            showSuccessMessage('Пространство успешно добавлена!');
             // Очистка формы
             event.target.reset();
             const statusUrl = response.headers.get('Location');
@@ -420,12 +420,12 @@ async function handleAddMachine(event) {
             pollingAsyncOperationStatus(id, statusUrl, fetchMachines);
         } else {
             const errorData = await response.json();
-            console.error('Ошибка при добавлении машинки:', errorData);
-            showErrorMessage('Не удалось добавить машинку. Проверьте данные и попробуйте снова.');
+            console.error('Ошибка при добавлении пространства:', errorData);
+            showErrorMessage('Не удалось добавить пространству. Проверьте данные и попробуйте снова.');
         }
     } catch (error) {
-        console.error('Ошибка при добавлении машинки:', error);
-        showErrorMessage('Произошла ошибка при добавлении машинки.');
+        console.error('Ошибка при добавлении пространства:', error);
+        showErrorMessage('Произошла ошибка при добавлении пространства.');
     }
 }
 
@@ -438,7 +438,7 @@ async function handleDeleteDormitory(event) {
     if (!locationId) return;
 
     // Подтверждение действия
-    const confirmDelete = confirm('Вы уверены, что хотите удалить это общежитие? Это действие нельзя отменить.');
+    const confirmDelete = confirm('Вы уверены, что хотите удалить это локацию? Это действие нельзя отменить.');
     if (!confirmDelete) return;
 
     try {
@@ -451,23 +451,23 @@ async function handleDeleteDormitory(event) {
         });
 
         if (response.ok) {
-            showSuccessMessage('Общежитие успешно удалено!');
+            showSuccessMessage('Локация успешно удалена!');
             // Обновление
             await fetchDormitories();
             await fetchMachines();
         } else {
             const errorData = await response.json();
-            console.error('Ошибка при удалении общежития:', errorData);
-            showErrorMessage('Не удалось удалить общежитие. Попробуйте снова.');
+            console.error('Ошибка при удалении локации:', errorData);
+            showErrorMessage('Не удалось удалить локацию. Попробуйте снова.');
         }
     } catch (error) {
-        console.error('Ошибка при удалении общежития:', error);
-        showErrorMessage('Произошла ошибка при удалении общежития.');
+        console.error('Ошибка при удалении пространства:', error);
+        showErrorMessage('Произошла ошибка при удалении локации.');
     }
 }
 
 /**
- * Обработчик удаления машинки
+ * Обработчик удаления пространства
  * @param {Event} event - Событие клика на кнопке удаления
  */
 async function handleDeleteMachine(event) {
@@ -488,17 +488,17 @@ async function handleDeleteMachine(event) {
         });
 
         if (response.ok) {
-            showSuccessMessage('Машинка успешно удалена!');
+            showSuccessMessage('Пространство успешно удалено!');
             // Обновлени
             await fetchMachines();
         } else {
             const errorData = await response.json();
-            console.error('Ошибка при удалении машинки:', errorData);
+            console.error('Ошибка при удалении пространства:', errorData);
             showErrorMessage('Не удалось удалить машинку. Попробуйте снова.');
         }
     } catch (error) {
-        console.error('Ошибка при удалении машинки:', error);
-        showErrorMessage('Произошла ошибка при удалении машинки.');
+        console.error('Ошибка при удалении пространства:', error);
+        showErrorMessage('Произошла ошибка при удалении пространства.');
     }
 }
 

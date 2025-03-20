@@ -40,7 +40,6 @@ CREATE TABLE IF NOT EXISTS users_roles (
     FOREIGN KEY (role_id) REFERENCES roles (id) ON DELETE CASCADE
     );
 
--- общежития, каждая машинка привязывается к определнной общаге
 CREATE TABLE IF NOT EXISTS dormitories (
                                            id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     name            VARCHAR(255) NOT NULL UNIQUE,
