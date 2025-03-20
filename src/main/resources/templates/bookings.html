@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>Бронирование Машин</title>
+    <title>Бронирование</title>
     <style>
         .header {
             background-color: #333;
@@ -221,7 +221,7 @@
 </head>
 <body>
 <div class="header">
-    <div class="title">Бронирование стиральных машинок</div>
+    <div class="title">Бронирование пространств</div>
     <div class="links">
         <a href="/home">Главная</a>
         <a href="/profile">Профиль</a>
@@ -231,12 +231,14 @@
 </div>
 
 <div class="content">
+    <h2>Выберите пространство для просмотра слотов</h2>
 
-    <h2>Выберите машинку для просмотра слотов</h2>
-    <div class="coworkings-container" id="coworkings-list">
-        <!-- Машинки будут загружены сюда -->
+    <!-- Список машинок/коворкингов -->
+    <div class="coworkings-container" id="machines-list">
+        <!-- Загружаются динамически из /api/machines/get-all -->
     </div>
 
+    <!-- Блок управления слотами (дата, кол-во недель) -->
     <div class="controls" id="slots-controls" style="display: none;">
         <label for="start-date">Выберите начальную дату:</label>
         <input type="date" id="start-date">
@@ -252,14 +254,15 @@
         <button id="load-slots-button">Загрузить слоты</button>
     </div>
 
-    <div class="slots-container" id="coworkings-container">
+    <!-- Слоты бронирования -->
+    <div class="slots-container" id="machines-container">
         <!-- Сгенерированные слоты для выбранной машинки будут отображаться здесь -->
     </div>
 </div>
 
 <div class="footer">
     <footer>
-        <span>©️ Бронирование стиральных машинок 2024</span>
+        <span>©️ Бронирование 2025</span>
     </footer>
     <a href="/report-issue"><b>Обратная связь</b></a>
 </div>
