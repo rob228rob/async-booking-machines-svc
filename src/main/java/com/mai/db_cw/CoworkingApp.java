@@ -10,10 +10,10 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @EnableScheduling
 @EnableAsync
 @EnableConfigurationProperties
-public class BookingMachines {
+public class CoworkingApp {
 
     public static void main(String[] args) {
-        SpringApplication.run(BookingMachines.class, args);
+        SpringApplication.run(CoworkingApp.class, args);
     }
 
 }

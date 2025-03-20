@@ -6,6 +6,9 @@ document.addEventListener('DOMContentLoaded', () => {
     loadMachines().then(() => console.log("machines loaded"));
 });
 
+/**
+ * Загрузка списка «машинок» (пусть остаётся /api/machines/get-all)
+ */
 async function loadMachines() {
     try {
         const response = await fetch('/api/machines/get-all', {
@@ -23,6 +26,14 @@ async function loadMachines() {
     }
 }
 
+/**
+ * Отображение списка машинок
+ * Предполагается, что бэкенд возвращает JSON с полями:
+ * - id
+ * - name
+ * - locationName (бывшее dormitoryName)
+ * - machineType
+ */
 function displayMachinesList(machines) {
     const machinesList = document.getElementById('machines-list');
     machinesList.innerHTML = '';
@@ -31,11 +42,12 @@ function displayMachinesList(machines) {
         const machineCard = document.createElement('div');
         machineCard.classList.add('machine-card');
         machineCard.innerHTML = `
-                <h3>${machine.name}</h3>
-                <p><strong>Общежитие:</strong> ${machine.dormitoryName || 'Неизвестно'}</p>
-                <p><strong>Тип пространства:</strong> ${machine.machineType || 'Неизвестно'}</p>
-            `;
+            <h3>${machine.name}</h3>
+            <p><strong>Локация:</strong> ${machine.locationName || 'Неизвестно'}</p>
+            <p><strong>Тип машинки:</strong> ${machine.machineType || 'Неизвестно'}</p>
+        `;
 
+        // При клике по карточке выбранная машинка запоминается, и показываем блок выбора слотов
         machineCard.addEventListener('click', () => {
             selectedMachineId = machine.id;
             document.getElementById('slots-controls').style.display = 'flex';
@@ -45,10 +57,14 @@ function displayMachinesList(machines) {
         machinesList.appendChild(machineCard);
     });
 
+    // Привязываем обработчик кнопки "Загрузить слоты"
     const loadSlotsButton = document.getElementById('load-slots-button');
     loadSlotsButton.addEventListener('click', loadMachineTimeSlots);
 }
 
+/**
+ * Загрузка временных слотов конкретной машинки
+ */
 async function loadMachineTimeSlots() {
     if (!selectedMachineId) {
         alert('Сначала выберите пространство');
@@ -70,6 +86,7 @@ async function loadMachineTimeSlots() {
     loadMachineTimeSlots.startDate = new Date(startDate);
     loadMachineTimeSlots.weeks = weeks;
 
+    // Предположим, что слоты тоже идут через /api/machine-slots/get
     const url = `/api/machine-slots/get?machineId=${selectedMachineId}&startDate=${startDate}&weeks=${weeks}`;
     try {
         const response = await fetch(url, {
@@ -78,6 +95,7 @@ async function loadMachineTimeSlots() {
         });
         if (response.ok) {
             const data = await response.json();
+            // Предположим, бэкенд возвращает объект { slots: [...] }
             displayGeneratedSlots(data.slots);
         } else {
             console.error('Не удалось получить слоты для пространства.');
@@ -87,6 +105,10 @@ async function loadMachineTimeSlots() {
     }
 }
 
+/**
+ * Отображение слотов
+ * Здесь, исходя из структуры данных, меняем "dormitoryName" → "locationName" и т.д.
+ */
 function displayGeneratedSlots(machines) {
     const machinesContainer = document.getElementById('machines-container');
     machinesContainer.innerHTML = '';
@@ -96,21 +118,19 @@ function displayGeneratedSlots(machines) {
     // Генерируем все даты для выбранного периода
     const allDates = [];
     const start = new Date(startDate);
-    // Устанавливаем начало недели на понедельник
-    start.setDate(start.getDate() - ((start.getDay() + 6) % 7));
+    start.setDate(start.getDate() - ((start.getDay() + 6) % 7)); // понедельник
 
     for (let week = 0; week < weeks; week++) {
-        for (let day = 1; day <= 7; day++) { // 1=Понедельник, 7=Воскресенье
+        for (let day = 1; day <= 7; day++) {
             const date = new Date(start);
             date.setDate(start.getDate() + week * 7 + (day - 1));
             allDates.push({
                 dayOfWeek: day,
-                date: date.toISOString().split('T')[0] // Формат YYYY-MM-DD
+                date: date.toISOString().split('T')[0]
             });
         }
     }
 
-    // Создаём карту для быстрого доступа к датам по dayOfWeek и неделе
     const dateMap = {};
     allDates.forEach((item, index) => {
         const weekNumber = Math.floor(index / 7) + 1;
@@ -119,8 +139,7 @@ function displayGeneratedSlots(machines) {
 
     machines.forEach((machine) => {
         machine.timeSlots.forEach((slot, index) => {
-            // Определяем номер недели для текущего слота
-            const weekNumber = Math.floor(index / machine.timeSlots.length * weeks) + 1;
+            const weekNumber = Math.floor((index / machine.timeSlots.length) * weeks) + 1;
             const resDate = dateMap[`${slot.dayOfWeek}-${weekNumber}`] || '';
 
             if (!resDate) {
@@ -128,7 +147,7 @@ function displayGeneratedSlots(machines) {
                 return;
             }
 
-            // Создаём карточку для машины, если ещё не создана
+            // Проверяем, создан ли уже блок для этой "машинки"
             let machineCard = machinesContainer.querySelector(`[data-machine-id="${machine.machineId}"]`);
             if (!machineCard) {
                 machineCard = document.createElement('div');
@@ -136,42 +155,45 @@ function displayGeneratedSlots(machines) {
                 machineCard.setAttribute('data-machine-id', machine.machineId);
                 machineCard.innerHTML = `
                     <h3>${machine.machineName}</h3>
-                    <p><strong>Общежитие:</strong> ${machine.dormitoryName}</p>
+                    <p><strong>Локация:</strong> ${machine.locationName}</p>
                     <ul class="time-slots"></ul>
                 `;
                 machinesContainer.appendChild(machineCard);
             }
 
             const timeSlotsList = machineCard.querySelector('.time-slots');
-
             const timeSlotItem = document.createElement('li');
-            timeSlotItem.classList.add('time-slot', slot.available ? 'available' : 'booked');
+            timeSlotItem.classList.add(
+                'time-slot',
+                slot.available ? 'available' : 'booked'
+            );
             timeSlotItem.innerHTML = `
                 <strong>${getDayOfWeekName(slot.dayOfWeek)} (${resDate})</strong>:
                 <span>${slot.startTime} - ${slot.endTime}</span>
-                ${slot.available
-                ? `<button class="book"
-                                data-machine-id="${machine.machineId}"
-                                data-res-date="${resDate}"
-                                data-start-time="${slot.startTime}"
-                                data-end-time="${slot.endTime}">
-                            Забронировать
+                ${
+                slot.available
+                    ? `<button class="book"
+                              data-machine-id="${machine.machineId}"
+                              data-res-date="${resDate}"
+                              data-start-time="${slot.startTime}"
+                              data-end-time="${slot.endTime}">
+                          Забронировать
                        </button>`
-                : `<button class="booked" disabled>Забронировано</button>`}
+                    : `<button class="booked" disabled>Забронировано</button>`
+            }
             `;
             timeSlotsList.appendChild(timeSlotItem);
         });
     });
 
-    // Добавляем обработчики событий для кнопок бронирования
+    // Назначаем обработчики на все кнопки «Забронировать»
     document.querySelectorAll('.book').forEach(button => {
         button.addEventListener('click', handleBooking);
     });
 }
 
 /**
- * Функция для обработки бронирования асинхронно с поллингом статуса
- * @param {Event} event - Событие клика на кнопке бронирования
+ * Обработка бронирования слота
  */
 async function handleBooking(event) {
     const machineId = event.target.getAttribute('data-machine-id');
@@ -184,11 +206,8 @@ async function handleBooking(event) {
         return;
     }
 
-    // if (!confirm('Вы уверены, что хотите забронировать этот слот?')) {
-    //     return;
-    // }
-
     const reservationRequest = {
+        // Если бекэнд ждёт machineId – так и оставляем
         machineId: machineId,
         resDate: resDate,
         startTime: startTime,
@@ -205,136 +224,66 @@ async function handleBooking(event) {
             body: JSON.stringify(reservationRequest),
         });
 
-        if (response.status === 202) { // HTTP 202 Accepted
+        if (response.status === 202) {
+            // ...
             const statusUrl = response.headers.get('Location');
             const reservationId = extractReservationIdFromUrl(statusUrl);
             showSuccessMessage('Бронирование инициировано. Ожидайте обновления статуса.');
 
-            // Начинаем поллинг статуса
             pollReservationStatus(reservationId, statusUrl);
         } else if (response.status === 400) {
-            alert('Выбрана невалидная дата, в прошлое нельзя бронироваться')
-        }
-        else {
+            alert('Невалидная дата (например, в прошлом).');
+        } else {
             const errorData = await response.json();
             alert(`Ошибка при бронировании: ${errorData.message || 'Неизвестная ошибка.'}`);
         }
     } catch (error) {
         console.error('Ошибка при бронировании:', error);
-        alert('Произошла ошибка при бронировании. Пожалуйста, попробуйте позже.');
-    } finally {
-        //hideSpinner();
+        alert('Произошла ошибка при бронировании.');
     }
 }
 
 /**
- * Функция для извлечения reservationId из URL статуса
- * @param {string} statusUrl - URL статуса
- * @returns {string} - reservationId
+ * Пример поллинга статуса
  */
 function extractReservationIdFromUrl(statusUrl) {
     const parts = statusUrl.split('/');
     return parts[parts.length - 1];
 }
-
-/**
- * Функция для поллинга статуса бронирования с использованием SweetAlert2
- * @param {string} reservationId - ID бронирования
- * @param {string} statusUrl - URL для проверки статуса
- */
 function pollReservationStatus(reservationId, statusUrl) {
-
     let attempts = 0;
 
-    console.log(`Начало поллинга статуса бронирования ID: ${reservationId}`);
-
     const intervalId = setInterval(async () => {
-        console.log(`Проверка статуса бронирования ID: ${reservationId}, попытка ${attempts + 1}`);
-
         try {
             const response = await fetch(statusUrl, {
                 method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
+                headers: { 'Content-Type': 'application/json' },
                 credentials: 'include'
             });
 
             if (response.ok) {
                 const statusText = await response.text();
-                console.log(`Статус бронирования ID: ${reservationId} - ${statusText}`);
-
                 if (statusText === 'Operation completed successfully') {
-                    console.log({
-                        title: 'Бронирование завершено',
-                        text: 'Ваше бронирование успешно завершено!',
-                        icon: 'success',
-                        timer: 5000,
-                        showConfirmButton: false
-                    });
                     clearInterval(intervalId);
-                    await loadMachineTimeSlots(); // Обновление списка слотов после успешного бронирования
+                    await loadMachineTimeSlots();
                 } else if (statusText.startsWith('Operation failed')) {
-                    console.log({
-                        title: 'Ошибка бронирования',
-                        text: `Бронирование не удалось: ${statusText}`,
-                        icon: 'error',
-                        timer: 5000,
-                        showConfirmButton: false
-                    });
-                    alert(`Бронирование не удалось: ${statusText}`)
                     clearInterval(intervalId);
-                } else {
-                    console.log(`Текущее состояние бронирования (${reservationId}): ${statusText}`);
+                    alert(`Бронирование не удалось: ${statusText}`);
                 }
-            } else if (response.status === 404) {
-                console.error('Статус бронирования не найден.');
-                console.log({
-                    title: 'Ошибка',
-                    text: 'Статус бронирования не найден.',
-                    icon: 'error',
-                    confirmButtonText: 'Ок'
-                });
-                alert(`Статус бронирования не найден`)
-                clearInterval(intervalId);
-            } else {
-                const errorData = await response.json();
-                console.error('Ошибка при проверке статуса бронирования:', errorData);
-                console.log({
-                    title: 'Ошибка',
-                    text: 'Не удалось проверить статус бронирования.',
-                    icon: 'error',
-                    confirmButtonText: 'Ок'
-                });
-                alert(`не удалось проверить статус: ${errorData}`);
-                clearInterval(intervalId);
             }
+            // ... прочие проверки
         } catch (error) {
-            console.error('Ошибка при проверке статуса бронирования:', error);
-            console.log({
-                title: 'Ошибка',
-                text: 'Произошла ошибка при проверке статуса бронирования.',
-                icon: 'error',
-                confirmButtonText: 'Ок'
-            });
-            alert(`не удалось проверить статус: ${error.message}`);
+            console.error('Ошибка при проверке статуса:', error);
             clearInterval(intervalId);
         }
 
         attempts++;
         if (attempts >= maxAttempts) {
             console.error('Время ожидания ответа от сервера истекло.');
-            console.log({
-                title: 'Время истекло',
-                text: 'Время ожидания ответа от сервера истекло.',
-                icon: 'warning',
-                confirmButtonText: 'Ок'
-            });
             clearInterval(intervalId);
         }
     }, pollingInterval);
 }
-
 /**
  * Функция для отображения сообщения об успешном действии
  * @param {string} message - Текст сообщения

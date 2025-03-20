@@ -2,10 +2,7 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Админская панель </title>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat+Alternates:wght@400;700&family=Roboto:wght@400;500&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="/css/admin.css">
+    <title>Админская панель</title>
     <style>
         body {
             font-family: 'Roboto', sans-serif;
@@ -104,14 +101,9 @@
     </style>
 </head>
 <body>
-<!-- Индикатор загрузки -->
-<div id="loading-indicator">
-    <p>Загрузка...</p>
-</div>
-
 <div class="admin-container">
-    <!-- Форма для добавления нового локации -->
-    <h2>Добавить Новое локация</h2>
+    <!-- Форма для добавления нового общежития -->
+    <h2>Добавить Новую Локацию</h2>
     <form id="add-dormitory-form">
         <label for="dorm-name">Название локации:</label>
         <input type="text" id="dorm-name" name="dormName" placeholder="Введите название локации" required>
@@ -121,76 +113,71 @@
 
         <button type="submit">Добавить локацию</button>
     </form>
-    <div class="message success" id="dorm-success-message">Локацияя успешно добавлено!</div>
-    <div class="message error" id="dorm-error-message">Ошибка при добавлении локации. Попробуйте снова.</div>
 
-    <!-- Форма для добавления новой пространство -->
-    <h2>Добавить Новой простратноство</h2>
-    <form id="add-coworking-form">
-        <label for="dormitory">локация:</label>
+    <h2>Добавить новое пространство</h2>
+    <form id="add-machine-form">  <!-- совпадает с JS addMachineForm -->
+        <label for="dormitory">Локация:</label>
         <select id="dormitory" name="dormitory" required>
-            <option value="">Выберите локация</option>
-            <!-- Опции будут загружены динамически -->
+            <option value="">Выберите локацию</option>
         </select>
 
-        <label for="coworking-name">Название Пространства:</label>
-        <input type="text" id="coworking-name" name="machineName" placeholder="Введите название пространство" required>
+        <label for="machine-name">Название пространства:</label>
+        <input type="text" id="machine-name" name="machineName" placeholder="Введите название пространства" required>
 
-        <label for="coworking-type">Тип пространство:</label>
-        <select id="coworking-type" name="machineType" required>
-            <option value="">Выберите тип пространство</option>
-            <option value="1">Стиральная Машинка (WASHER)</option>
-            <option value="2">Сушильная Машинка (DRYER)</option>
+        <label for="machine-type">Тип пространства:</label>
+        <select id="machine-type" name="machineType" required>
+            <option value="">Выберите тип помещения</option>
+            <option value="1">OPENSPACE</option>
+            <option value="2">MEETINGS</option>
         </select>
 
-        <button type="submit">Добавить Машинку</button>
+        <button type="submit">Добавить пространство</button>
     </form>
-    <div class="message success" id="success-message">Машинка успешно добавлена!</div>
-    <div class="message error" id="error-message">Ошибка при добавлении пространство. Попробуйте снова.</div>
 
-    <!-- Секция для отображения списка машинок -->
+    <div class="message success" id="success-message" style="display: none;"></div>
+    <div class="message error" id="error-message" style="display: none;"></div>
+
+    <!-- Таблица для «машинок», но ID совпадает с JS -->
     <div class="list-section">
-        <h2>Список Машинок</h2>
-        <table id="coworkings-table">
+        <h2>Список пространств</h2>
+        <table id="machines-table">  <!-- совпадает с JS populateMachinesTable -->
             <thead>
             <tr>
-                <th>ID пространство</th>
+                <th>ID</th>
                 <th>Название</th>
                 <th>Тип</th>
-                <th>локация</th>
+                <th>Локация</th>
                 <th>Действия</th>
             </tr>
             </thead>
-            <tbody>
-            <!-- пространство будут загружены сюда динамически -->
-            </tbody>
+            <tbody></tbody>
         </table>
     </div>
 
     <!-- Секция для отображения списка общежитий -->
     <div class="list-section">
-        <h2>Список Общежитий</h2>
+        <h2>Список Локаций</h2>
         <table id="dormitories-table">
             <thead>
             <tr>
-                <th>ID локации</th>
+                <th>ID</th>
                 <th>Название</th>
                 <th>Адрес</th>
                 <th>Действия</th>
             </tr>
             </thead>
-            <tbody>
-            <!-- локации будут загружены сюда динамически -->
-            </tbody>
+
+            <tbody></tbody>
         </table>
     </div>
 
-    <!-- Новая секция для отображения логов -->
+    <!-- Секция для логов -->
     <div class="list-section">
         <h2>Список Логов</h2>
         <label for="log-limit">Количество последних логов:</label>
-        <input type="number" id="log-limit" name="logLimit" value="50" min="1" max="1000" required>
+        <input type="number" id="log-limit" value="50" min="1" max="1000">
         <button id="load-logs-button">Загрузить Логи</button>
+
         <table id="logs-table">
             <thead>
             <tr>
@@ -201,14 +188,12 @@
                 <th>Новые данные</th>
             </tr>
             </thead>
-            <tbody>
-            <!-- Данные будут добавлены динамически -->
-            </tbody>
+            <tbody></tbody>
         </table>
-
     </div>
 </div>
 
+<!-- Скрипт в самом конце, чтобы элементы успели отрендериться -->
 <script src="/js/admin.js"></script>
 </body>
 </html>
