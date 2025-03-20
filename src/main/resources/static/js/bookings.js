@@ -250,40 +250,51 @@ function extractReservationIdFromUrl(statusUrl) {
     const parts = statusUrl.split('/');
     return parts[parts.length - 1];
 }
-function pollReservationStatus(reservationId, statusUrl) {
-    let attempts = 0;
 
+async function pollReservationStatus(reservationId, statusUrl) {
+    let attempts = 0;
     const intervalId = setInterval(async () => {
         try {
             const response = await fetch(statusUrl, {
                 method: 'GET',
-                headers: { 'Content-Type': 'application/json' },
                 credentials: 'include'
             });
 
             if (response.ok) {
+                // Если 2xx, получаем текст
                 const statusText = await response.text();
                 if (statusText === 'Operation completed successfully') {
                     clearInterval(intervalId);
+                    // Обновить слоты
                     await loadMachineTimeSlots();
                 } else if (statusText.startsWith('Operation failed')) {
                     clearInterval(intervalId);
                     alert(`Бронирование не удалось: ${statusText}`);
+                } else {
+                    console.log(`Текущее состояние [${reservationId}]: ${statusText}`);
                 }
+            } else {
+                // Ошибка: читаем текст, потому что сервер может вернуть text/plain
+                const errorText = await response.text();
+                alert(`Ошибка при проверке статуса: ${errorText}`);
+                clearInterval(intervalId);
             }
-            // ... прочие проверки
+
         } catch (error) {
-            console.error('Ошибка при проверке статуса:', error);
+            console.error('Ошибка при поллинге:', error);
             clearInterval(intervalId);
         }
 
         attempts++;
         if (attempts >= maxAttempts) {
-            console.error('Время ожидания ответа от сервера истекло.');
+            console.warn('Время ожидания ответа от сервера истекло.');
             clearInterval(intervalId);
         }
     }, pollingInterval);
 }
+
+
+
 /**
  * Функция для отображения сообщения об успешном действии
  * @param {string} message - Текст сообщения
