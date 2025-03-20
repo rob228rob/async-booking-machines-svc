@@ -19,10 +19,10 @@ async function loadMachines() {
             const data = await response.json();
             displayMachinesList(data);
         } else {
-            console.error('Не удалось получить список пространств.');
+            console.error('Не удалось получить список машин.');
         }
     } catch (error) {
-        console.error('Ошибка при получении списка пространств:', error);
+        console.error('Ошибка при получении списка машин:', error);
     }
 }
 
@@ -67,7 +67,7 @@ function displayMachinesList(machines) {
  */
 async function loadMachineTimeSlots() {
     if (!selectedMachineId) {
-        alert('Сначала выберите пространство');
+        alert('Сначала выберите машинку');
         return;
     }
 
@@ -98,10 +98,10 @@ async function loadMachineTimeSlots() {
             // Предположим, бэкенд возвращает объект { slots: [...] }
             displayGeneratedSlots(data.slots);
         } else {
-            console.error('Не удалось получить слоты для пространства.');
+            console.error('Не удалось получить слоты для машинки.');
         }
     } catch (error) {
-        console.error('Ошибка при получении слотов для пространства:', error);
+        console.error('Ошибка при получении слотов для машинки:', error);
     }
 }
 
