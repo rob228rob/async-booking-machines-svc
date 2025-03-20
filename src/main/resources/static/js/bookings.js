@@ -1,41 +1,45 @@
 let selectedMachineId = null;
-let pollingInterval = 150; // Интервал в миллисекундах
-let maxAttempts = 5; // Максимальное количество попыток
+const pollingInterval = 150; // Интервал в мс
+const maxAttempts = 5;       // Макс. кол-во запросов при поллинге
 
 document.addEventListener('DOMContentLoaded', () => {
-    loadMachines().then(() => console.log("machines loaded"));
+    loadMachines().then(() => console.log("Machines loaded"));
 });
 
 /**
- * Загрузка списка «машинок» (пусть остаётся /api/machines/get-all)
+ * 1) Получить список машинок с бекенда (/api/machines/get-all),
+ *    затем вызвать displayMachinesList(...)
  */
 async function loadMachines() {
     try {
         const response = await fetch('/api/machines/get-all', {
             method: 'GET',
-            credentials: 'include',
+            credentials: 'include'
         });
         if (response.ok) {
             const data = await response.json();
             displayMachinesList(data);
         } else {
-            console.error('Не удалось получить список машин.');
+            console.error('Не удалось получить список машинок.');
+            showErrorMessage('Ошибка при загрузке списка машинок.');
         }
     } catch (error) {
-        console.error('Ошибка при получении списка машин:', error);
+        console.error('Ошибка при получении списка машинок:', error);
+        showErrorMessage('Произошла ошибка при загрузке машинок.');
     }
 }
 
 /**
- * Отображение списка машинок
- * Предполагается, что бэкенд возвращает JSON с полями:
- * - id
- * - name
- * - locationName (бывшее dormitoryName)
- * - machineType
+ * 2) Отображаем список машинок на странице.
+ *    Предполагаем, что "data" – это массив машинок, каждый объект вида:
+ *    { id, name, locationName, machineType, ... }
  */
 function displayMachinesList(machines) {
     const machinesList = document.getElementById('machines-list');
+    if (!machinesList) {
+        console.warn('Не найден элемент #machines-list в HTML.');
+        return;
+    }
     machinesList.innerHTML = '';
 
     machines.forEach(machine => {
@@ -46,8 +50,7 @@ function displayMachinesList(machines) {
             <p><strong>Локация:</strong> ${machine.locationName || 'Неизвестно'}</p>
             <p><strong>Тип машинки:</strong> ${machine.machineType || 'Неизвестно'}</p>
         `;
-
-        // При клике по карточке выбранная машинка запоминается, и показываем блок выбора слотов
+        // При клике выбираем машинку и показываем форму выбора слотов
         machineCard.addEventListener('click', () => {
             selectedMachineId = machine.id;
             document.getElementById('slots-controls').style.display = 'flex';
@@ -57,13 +60,15 @@ function displayMachinesList(machines) {
         machinesList.appendChild(machineCard);
     });
 
-    // Привязываем обработчик кнопки "Загрузить слоты"
+    // Кнопка "Загрузить слоты"
     const loadSlotsButton = document.getElementById('load-slots-button');
-    loadSlotsButton.addEventListener('click', loadMachineTimeSlots);
+    if (loadSlotsButton) {
+        loadSlotsButton.addEventListener('click', loadMachineTimeSlots);
+    }
 }
 
 /**
- * Загрузка временных слотов конкретной машинки
+ * 3) Загрузить слоты для выбранной машинки, начиная со startDate, на указанное кол-во недель
  */
 async function loadMachineTimeSlots() {
     if (!selectedMachineId) {
@@ -74,6 +79,11 @@ async function loadMachineTimeSlots() {
     const startDateInput = document.getElementById('start-date');
     const weeksSelect = document.getElementById('weeks');
 
+    if (!startDateInput || !weeksSelect) {
+        console.error('Не найдены поля #start-date или #weeks в HTML.');
+        return;
+    }
+
     const startDate = startDateInput.value;
     const weeks = parseInt(weeksSelect.value);
 
@@ -81,44 +91,51 @@ async function loadMachineTimeSlots() {
         alert('Пожалуйста, выберите начальную дату');
         return;
     }
+    if (isNaN(weeks) || weeks < 1) {
+        alert('Некорректное количество недель');
+        return;
+    }
 
-    // Сохраняем выбранную дату и количество недель для дальнейшего расчёта resDate
+    // Сохраняем дату и weeks для дальнейшего расчёта
     loadMachineTimeSlots.startDate = new Date(startDate);
     loadMachineTimeSlots.weeks = weeks;
 
-    // Предположим, что слоты тоже идут через /api/machine-slots/get
     const url = `/api/machine-slots/get?machineId=${selectedMachineId}&startDate=${startDate}&weeks=${weeks}`;
     try {
-        const response = await fetch(url, {
-            method: 'GET',
-            credentials: 'include',
-        });
+        const response = await fetch(url, { method: 'GET', credentials: 'include' });
         if (response.ok) {
+            // Бэкенд возвращает объект вида { slots: [ {machineId, machineName, locationName, timeSlots: [...]}, ... ] }
             const data = await response.json();
-            // Предположим, бэкенд возвращает объект { slots: [...] }
             displayGeneratedSlots(data.slots);
         } else {
-            console.error('Не удалось получить слоты для машинки.');
+            console.error('Не удалось получить слоты для машинки.', response.status);
+            showErrorMessage('Ошибка при загрузке слотов.');
         }
     } catch (error) {
-        console.error('Ошибка при получении слотов для машинки:', error);
+        console.error('Ошибка при получении слотов:', error);
+        showErrorMessage('Произошла ошибка при загрузке слотов.');
     }
 }
 
 /**
- * Отображение слотов
- * Здесь, исходя из структуры данных, меняем "dormitoryName" → "locationName" и т.д.
+ * 4) Отобразить слоты.
+ *    "machines" → массив, где каждый элемент – объект { machineId, machineName, locationName, timeSlots: [...] }.
  */
 function displayGeneratedSlots(machines) {
     const machinesContainer = document.getElementById('machines-container');
+    if (!machinesContainer) {
+        console.warn('Не найден элемент #machines-container.');
+        return;
+    }
     machinesContainer.innerHTML = '';
 
     const { startDate, weeks } = loadMachineTimeSlots;
 
-    // Генерируем все даты для выбранного периода
+    // Генерируем все "даты" на фронте, чтобы рассчитать weekNumber.
     const allDates = [];
     const start = new Date(startDate);
-    start.setDate(start.getDate() - ((start.getDay() + 6) % 7)); // понедельник
+    // Ставим Monday как начало
+    start.setDate(start.getDate() - ((start.getDay() + 6) % 7));
 
     for (let week = 0; week < weeks; week++) {
         for (let day = 1; day <= 7; day++) {
@@ -131,23 +148,27 @@ function displayGeneratedSlots(machines) {
         }
     }
 
+    // Создаём map { "dayOfWeek-weekNumber": "YYYY-MM-DD" }
     const dateMap = {};
     allDates.forEach((item, index) => {
         const weekNumber = Math.floor(index / 7) + 1;
         dateMap[`${item.dayOfWeek}-${weekNumber}`] = item.date;
     });
 
+    // Проходимся по каждому объекту: { machineId, machineName, timeSlots: [...] }
     machines.forEach((machine) => {
         machine.timeSlots.forEach((slot, index) => {
+            // Если в бэке нет чёткого порядка, эта логика "weekNumber" может быть упрощена.
+            // Но оставим, как в исходном коде.
             const weekNumber = Math.floor((index / machine.timeSlots.length) * weeks) + 1;
             const resDate = dateMap[`${slot.dayOfWeek}-${weekNumber}`] || '';
 
             if (!resDate) {
-                console.error(`Не удалось определить дату для dayOfWeek: ${slot.dayOfWeek}, weekNumber: ${weekNumber}`);
+                console.error(`Не удалось определить дату для dayOfWeek=${slot.dayOfWeek}, weekNumber=${weekNumber}`);
                 return;
             }
 
-            // Проверяем, создан ли уже блок для этой "машинки"
+            // Ищем div для этой «машинки». Если нет — создаём.
             let machineCard = machinesContainer.querySelector(`[data-machine-id="${machine.machineId}"]`);
             if (!machineCard) {
                 machineCard = document.createElement('div');
@@ -155,45 +176,50 @@ function displayGeneratedSlots(machines) {
                 machineCard.setAttribute('data-machine-id', machine.machineId);
                 machineCard.innerHTML = `
                     <h3>${machine.machineName}</h3>
-                    <p><strong>Локация:</strong> ${machine.locationName}</p>
+                    <p><strong>Локация:</strong> ${machine.locationName || 'Неизвестно'}</p>
                     <ul class="time-slots"></ul>
                 `;
                 machinesContainer.appendChild(machineCard);
             }
 
             const timeSlotsList = machineCard.querySelector('.time-slots');
+
+            // Проверяем поле "available" (или "isAvailable") в JSON
+            const isAvailable = slot.available; // Или slot.isAvailable
             const timeSlotItem = document.createElement('li');
             timeSlotItem.classList.add(
                 'time-slot',
-                slot.available ? 'available' : 'booked'
+                isAvailable ? 'available' : 'booked'
             );
+
             timeSlotItem.innerHTML = `
                 <strong>${getDayOfWeekName(slot.dayOfWeek)} (${resDate})</strong>:
                 <span>${slot.startTime} - ${slot.endTime}</span>
                 ${
-                slot.available
+                isAvailable
                     ? `<button class="book"
                               data-machine-id="${machine.machineId}"
                               data-res-date="${resDate}"
                               data-start-time="${slot.startTime}"
                               data-end-time="${slot.endTime}">
-                          Забронировать
+                         Забронировать
                        </button>`
                     : `<button class="booked" disabled>Забронировано</button>`
             }
             `;
+
             timeSlotsList.appendChild(timeSlotItem);
         });
     });
 
-    // Назначаем обработчики на все кнопки «Забронировать»
+    // Вешаем обработчик клика "Забронировать"
     document.querySelectorAll('.book').forEach(button => {
         button.addEventListener('click', handleBooking);
     });
 }
 
 /**
- * Обработка бронирования слота
+ * 5) Отправка бронирования слота на /api/reservations/book (POST JSON)
  */
 async function handleBooking(event) {
     const machineId = event.target.getAttribute('data-machine-id');
@@ -203,29 +229,26 @@ async function handleBooking(event) {
 
     if (!machineId || !resDate || !startTime || !endTime) {
         console.error('Недостаточно данных для бронирования.');
+        showErrorMessage('Отсутствуют необходимые данные для бронирования.');
         return;
     }
 
     const reservationRequest = {
-        // Если бекэнд ждёт machineId – так и оставляем
-        machineId: machineId,
-        resDate: resDate,
-        startTime: startTime,
-        endTime: endTime
+        machineId,
+        resDate,
+        startTime,
+        endTime
     };
 
     try {
         const response = await fetch('/api/reservations/book', {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
+            headers: { 'Content-Type': 'application/json' },
             credentials: 'include',
-            body: JSON.stringify(reservationRequest),
+            body: JSON.stringify(reservationRequest)
         });
 
         if (response.status === 202) {
-            // ...
             const statusUrl = response.headers.get('Location');
             const reservationId = extractReservationIdFromUrl(statusUrl);
             showSuccessMessage('Бронирование инициировано. Ожидайте обновления статуса.');
@@ -239,17 +262,21 @@ async function handleBooking(event) {
         }
     } catch (error) {
         console.error('Ошибка при бронировании:', error);
-        alert('Произошла ошибка при бронировании.');
+        alert('Произошла ошибка при бронировании. Повторите позже.');
     }
 }
 
 /**
- * Пример поллинга статуса
+ * Извлекаем reservationId из URL типа "/api/reservations/status/abcdef-12345"
  */
 function extractReservationIdFromUrl(statusUrl) {
     const parts = statusUrl.split('/');
     return parts[parts.length - 1];
 }
+
+/**
+ * 6) Поллинг статуса бронирования, пока оно не завершится успешно/неудачно
+ */
 function pollReservationStatus(reservationId, statusUrl) {
     let attempts = 0;
 
@@ -265,15 +292,24 @@ function pollReservationStatus(reservationId, statusUrl) {
                 const statusText = await response.text();
                 if (statusText === 'Operation completed successfully') {
                     clearInterval(intervalId);
+                    showSuccessMessage('Бронирование успешно!');
+                    // Обновить слоты
                     await loadMachineTimeSlots();
                 } else if (statusText.startsWith('Operation failed')) {
                     clearInterval(intervalId);
                     alert(`Бронирование не удалось: ${statusText}`);
+                } else {
+                    console.log(`Текущее состояние [${reservationId}]: ${statusText}`);
                 }
+            } else if (response.status === 404) {
+                console.error('Статус бронирования не найден');
+                clearInterval(intervalId);
+            } else {
+                console.error('Не удалось проверить статус бронирования');
+                clearInterval(intervalId);
             }
-            // ... прочие проверки
         } catch (error) {
-            console.error('Ошибка при проверке статуса:', error);
+            console.error('Ошибка при проверке статуса бронирования:', error);
             clearInterval(intervalId);
         }
 
@@ -284,22 +320,23 @@ function pollReservationStatus(reservationId, statusUrl) {
         }
     }, pollingInterval);
 }
+
 /**
- * Функция для отображения сообщения об успешном действии
- * @param {string} message - Текст сообщения
+ * Функция для отображения сообщения об успехе
  */
 function showSuccessMessage(message) {
     let successMessage = document.getElementById('success-message');
     if (!successMessage) {
-        successMessage = document.createElement('success-message')
+        // На случай, если нет такого элемента, можем его создать
+        successMessage = document.createElement('div');
+        successMessage.id = 'success-message';
+        document.body.appendChild(successMessage);
     }
     successMessage.textContent = message;
     successMessage.classList.remove('error');
     successMessage.classList.add('success');
     successMessage.style.display = 'block';
 
-
-    // Скрыть сообщение через 5 секунд
     setTimeout(() => {
         successMessage.style.display = 'none';
     }, 5000);
@@ -307,45 +344,29 @@ function showSuccessMessage(message) {
 
 /**
  * Функция для отображения сообщения об ошибке
- * @param {string} message - Текст сообщения
  */
 function showErrorMessage(message) {
-    const errorMessage = document.getElementById('error-message');
+    let errorMessage = document.getElementById('error-message');
+    if (!errorMessage) {
+        // Если не нашли элемент, создадим
+        errorMessage = document.createElement('div');
+        errorMessage.id = 'error-message';
+        document.body.appendChild(errorMessage);
+    }
     errorMessage.textContent = message;
     errorMessage.classList.remove('success');
     errorMessage.classList.add('error');
     errorMessage.style.display = 'block';
 
-    // Скрыть сообщение через 5 секунд
     setTimeout(() => {
         errorMessage.style.display = 'none';
     }, 5000);
 }
 
-
-function formatTimeSlot(slot) {
-    const start = formatTime(slot.startTime);
-    const end = formatTime(slot.endTime);
-    return `${start} - ${end}`;
-}
-
-function formatTime(timeStr) {
-    const [hours, minutes] = timeStr.split(':');
-    return `${hours}:${minutes}`;
-}
-
+/**
+ * Утильные методы
+ */
 function getDayOfWeekName(dayOfWeek) {
-    const days = ['Понедельник', 'Вторник', 'Среда', 'Четверг', 'Пятница', 'Суббота', 'Воскресенье'];
+    const days = ['Понедельник','Вторник','Среда','Четверг','Пятница','Суббота','Воскресенье'];
     return days[dayOfWeek - 1] || 'Неизвестный день';
-}
-
-function groupBy(array, key) {
-    return array.reduce((result, currentItem) => {
-        const groupKey = currentItem[key];
-        if (!result[groupKey]) {
-            result[groupKey] = [];
-        }
-        result[groupKey].push(currentItem);
-        return result;
-    }, {});
 }
