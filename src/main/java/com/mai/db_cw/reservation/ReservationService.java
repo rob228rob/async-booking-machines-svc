@@ -43,7 +43,6 @@ public class ReservationService {
     @Transactional
     public void bookReservation(UUID randomId, String userEmail, ReservationRequest request) {
         try {
-            // Проверка существования пользователя и машинки
             User user = userService.findByEmail(userEmail)
                     .orElseThrow(() -> new InvalidUserInfoException("Пользователь не найден"));
 
@@ -58,10 +57,13 @@ public class ReservationService {
                             (reservation.getStartTime().equals(request.startTime()) && reservation.getEndTime().equals(request.endTime())) ||
                                     (reservation.getStartTime().isBefore(request.endTime()) && reservation.getEndTime().isAfter(request.startTime()))
                     );
-
-            if (request.resDate().isBefore(LocalDate.now()) && request.startTime().isBefore(LocalTime.now())) {
-                throw new ApplicationException("Нельзя бронировать на время которое до сейчас, типа оно уже прошло ну, типа прошлое", HttpStatus.BAD_REQUEST);
+            // валидация выбранного времени от текущего
+            if (request.resDate().isBefore(LocalDate.now())
+                    || (request.resDate().isEqual(LocalDate.now()) && request.startTime().isBefore(LocalTime.now()))
+            ) {
+                throw new ApplicationException("Нельзя бронировать на уже прошедшее время", HttpStatus.BAD_REQUEST);
             }
+
 
             if (!isAvailable) {
                 throw new ApplicationException("Выбранный слот уже забронирован", HttpStatus.CONFLICT);
