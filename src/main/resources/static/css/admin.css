@@ -15,7 +15,7 @@ body {
   height: auto; /* Шапка теперь будет иметь автоматическую высоту, адаптируясь под контент */
   padding: 20px; /* Немного уменьшил отступы, чтобы они выглядели лучше на мобильных */
   font-size: 28px;
-  color: #4CAF50;
+  color: #8E44AD;
   font-family: 'Montserrat Alternates', sans-serif;
   font-weight: 700;
   display: flex;
@@ -33,7 +33,7 @@ body {
   margin-top: 10px;
 }
 .header .links a.login {
-  background-color: #4CAF50; /* Цвет фона */
+  background-color: #8E44AD; /* Цвет фона */
   color: white; /* Цвет текста */
   font-size: 18px; /* Размер шрифта */
   padding: 12px 20px; /* Отступы */
@@ -44,16 +44,16 @@ body {
   align-items: center; /* Центрирование по вертикали */
 }
 .header .links a.logout:hover {
-  background-color: darkgreen;
+  background-color: #5B2C6F;
   color: white;
 }
 .header .links a.login:hover {
-  background-color: forestgreen; /* Более темный цвет при наведении */
+  background-color: #6C3483; /* Более темный цвет при наведении */
   transform: translateY(-2px); /* Эффект поднятия кнопки */
 }
 
 .header .links a.logout {
-  background-color: darkgreen; /* Красный цвет для кнопки выхода */
+  background-color: #5B2C6F; /* Красный цвет для кнопки выхода */
   color: white; /* Цвет текста */
 }
 
@@ -63,12 +63,12 @@ body {
   color: white;
   padding: 8px 15px;
   border-radius: 30px;
-  border: 2px solid #4CAF50;
+  border: 2px solid #8E44AD;
   transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 .header .links a:hover {
-  background-color: #4CAF50;
+  background-color: #8E44AD;
   color: white;
 }
 
@@ -97,15 +97,15 @@ body {
 }
 .footer a {
   text-decoration: none;
-  color: #4CAF50;
+  color: #8E44AD;
   font-size: 16px;
   padding: 8px 15px;
-  border: 2px solid #4CAF50;
+  border: 2px solid #8E44AD;
   border-radius: 20px;
   transition: background-color 0.3s ease, color 0.3s ease;
 }
 .footer a:hover {
-  background-color: #4CAF50;
+  background-color: #8E44AD;
   color: white;
 }
 * {
@@ -153,12 +153,12 @@ header nav ul button {
 }
 
 header nav ul button a {
-  color: mediumspringgreen;
+  color: #5B2C6F;
 }
 
 header nav ul button a:hover {
   /* background-color: #444; */
-  color: #00a761;
+  color: #5B2C6F;
 }
 
 header nav ul {
@@ -185,7 +185,7 @@ header nav a:hover {
 
 header nav a.active {
   font-weight: bold;
-  color: mediumspringgreen;
+  color: #5B2C6F;
 }
 
 /* Main Content Styles */
@@ -215,7 +215,7 @@ main section {
 
 main div button {
   font-size: large;
-  color: mediumspringgreen;
+  color: #5B2C6F;
   background-color: #414141;
   padding: 8px;
   margin-top: 0.5em;
@@ -224,7 +224,7 @@ main div button {
 }
 
 main div button:hover {
-  color: #00a761;
+  color: #5B2C6F;
   background-color: #333;
 }
 
@@ -262,13 +262,13 @@ main div button:hover {
   padding: 10px;
   border: none;
   background-color: #414141;
-  color: mediumspringgreen;
+  color: #5B2C6F;
   cursor: pointer;
 }
 
 .course-form button[type="submit"]:hover, .article-form button[type="submit"]:hover, .test-form button[type="submit"]:hover, .questions-form button[type="submit"]:hover {
   background-color: #333;
-  color: #00a761;
+  color: #5B2C6F;
 }
 
 /* Footer Styles */
@@ -293,7 +293,7 @@ table {
 }
 
 table td, table th {
-  border: 1px solid mediumspringgreen;
+  border: 1px solid #5B2C6F;
   color: white;
   background: #414141;
   max-width: 100px;
@@ -302,12 +302,12 @@ table td, table th {
 }
 
 table td a {
-  color: mediumspringgreen;
+  color: #5B2C6F;
   padding: 8px;
   margin-top: 0.5em;
   cursor: pointer;
 }
 
 table td a:hover {
-  color: #00a761;
+  color: #5B2C6F;
 }

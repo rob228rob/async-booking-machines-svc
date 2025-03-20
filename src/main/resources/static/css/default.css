@@ -13,7 +13,7 @@ body {
     height: auto; /* Шапка теперь будет иметь автоматическую высоту, адаптируясь под контент */
     padding: 20px; /* Немного уменьшил отступы, чтобы они выглядели лучше на мобильных */
     font-size: 28px;
-    color: #4CAF50;
+    color: #8E44AD;
     font-family: 'Montserrat Alternates', sans-serif;
     font-weight: 700;
     display: flex;
@@ -31,7 +31,7 @@ body {
     margin-top: 10px;
 }
 .header .links a.login {
-    background-color: #4CAF50; /* Цвет фона */
+    background-color:#8E44AD; /* Цвет фона */
     color: white; /* Цвет текста */
     font-size: 18px; /* Размер шрифта */
     padding: 12px 20px; /* Отступы */
@@ -42,17 +42,17 @@ body {
     align-items: center; /* Центрирование по вертикали */
 }
 .header .links a.login:hover {
-    background-color: forestgreen; /* Более темный цвет при наведении */
+    background-color: #6C3483; /* Более темный цвет при наведении */
     transform: translateY(-2px); /* Эффект поднятия кнопки */
 }
 .header .links a.logout:hover {
-    background-color: darkgreen;
+    background-color: #5B2C6F;
     color: white;
 }
 
 
 .header .links a.logout {
-    background-color: darkgreen; /* Красный цвет для кнопки выхода */
+    background-color: #5B2C6F; /* Красный цвет для кнопки выхода */
     color: white; /* Цвет текста */
 }
 
@@ -61,13 +61,13 @@ body {
     font-size: 16px;
     color: white;
     padding: 8px 15px;
-    border: 2px solid #4CAF50;
+    border: 2px solid #8E44AD;
     border-radius: 20px;
     transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 .header .links a:hover {
-    background-color: #4CAF50;
+    background-color: #8E44AD;
     color: white;
 }
 .content {
@@ -128,7 +128,7 @@ body {
 /* Кнопка выбора машинки */
 .select-machine-button {
     margin-top: 15px;
-    background-color: #4CAF50;
+    background-color: #8E44AD;
     color: white;
     border: none;
     padding: 8px 16px;
@@ -207,7 +207,7 @@ body {
 }
 
 .slot-item.available {
-    border-left: 5px solid #4CAF50;
+    border-left: 5px solid #8E44AD;
 }
 
 .slot-item.booked {
@@ -223,7 +223,7 @@ body {
 }
 
 .slot-item button.book {
-    background-color: #4CAF50;
+    background-color: #8E44AD;
     color: white;
 }
 
@@ -260,7 +260,7 @@ body {
     display: none;
     margin: 20px auto;
     border: 8px solid #f3f3f3;
-    border-top: 8px solid #4CAF50;
+    border-top: 8px solid #8E44AD;
     border-radius: 50%;
     width: 60px;
     height: 60px;
@@ -273,7 +273,7 @@ body {
 
 /* Стили для кнопки бронирования */
 .booking-button {
-    background-color: #4CAF50;
+    background-color: #8E44AD;
     color: white;
     border: none;
     padding: 6px 12px;
@@ -292,7 +292,7 @@ body {
 }
 
 .submit-button {
-    background-color: #4CAF50;
+    background-color: #8E44AD;
     color: white;
 }
 
@@ -320,12 +320,12 @@ body {
     top: 10px;
     right: 10px;
     padding: 5px 10px;
-    background-color: #4CAF50;
+    background-color: #8E44AD;
     color: white;
     border-radius: 5px;
 }
 .course-card .price-label.free {
-    background-color: #4CAF50;
+    background-color: #8E44AD;
 }
 .course-card .price-label.paid {
     background-color: #FF5722;
@@ -346,7 +346,7 @@ body {
     width: 50%; /* Ширина инпута 50% от ширины родительского контейнера */
     padding: 10px;
     font-size: 16px;
-    border: 2px solid #4CAF50;
+    border: 2px solid #8E44AD;
     border-radius: 20px;
     outline: none;
     transition: box-shadow 0.3s ease;
@@ -418,15 +418,15 @@ body {
 }
 .footer a {
     text-decoration: none;
-    color: #4CAF50;
+    color: #8E44AD;
     font-size: 16px;
     padding: 8px 15px;
-    border: 2px solid #4CAF50;
+    border: 2px solid #8E44AD;
     border-radius: 20px;
     transition: background-color 0.3s ease, color 0.3s ease;
 }
 .footer a:hover {
-    background-color: #4CAF50;
+    background-color: #8E44AD;
     color: white;
 }
 @media (max-width: 768px) {

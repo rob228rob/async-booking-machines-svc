@@ -44,7 +44,7 @@ function displayMachinesList(machines) {
         machineCard.innerHTML = `
             <h3>${machine.name}</h3>
             <p><strong>Локация:</strong> ${machine.locationName || 'Неизвестно'}</p>
-            <p><strong>Тип машинки:</strong> ${machine.machineType || 'Неизвестно'}</p>
+            <p><strong>Пространство:</strong> ${machine.machineType || 'Неизвестно'}</p>
         `;
 
         // При клике по карточке выбранная машинка запоминается, и показываем блок выбора слотов
@@ -67,7 +67,7 @@ function displayMachinesList(machines) {
  */
 async function loadMachineTimeSlots() {
     if (!selectedMachineId) {
-        alert('Сначала выберите машинку');
+        alert('Сначала выберите пространство');
         return;
     }
 
@@ -98,10 +98,10 @@ async function loadMachineTimeSlots() {
             // Предположим, бэкенд возвращает объект { slots: [...] }
             displayGeneratedSlots(data.slots);
         } else {
-            console.error('Не удалось получить слоты для машинки.');
+            console.error('Не удалось получить слоты для пространства.');
         }
     } catch (error) {
-        console.error('Ошибка при получении слотов для машинки:', error);
+        console.error('Ошибка при получении слотов для пространства:', error);
     }
 }
 
