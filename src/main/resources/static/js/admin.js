@@ -76,7 +76,7 @@ function populateDormitorySelect(dormitories) {
  */
 function populateDormitoriesTable(dormitories) {
     const dormitoriesTableBody = document.querySelector('#dormitories-table tbody');
-    dormitoriesTableBody.innerHTML = ''; // Очистка таблицы
+    dormitoriesTableBody.innerHTML = ''; // ОчисткаdormitoryAddress  таблицы
 
     dormitories.forEach(dorm => {
         const row = document.createElement('tr');
@@ -84,7 +84,7 @@ function populateDormitoriesTable(dormitories) {
         row.innerHTML = `
             <td>${dorm.id}</td>
             <td>${dorm.name}</td>
-            <td>${dorm.dormitoryAddress || 'Не указано'}</td>
+            <td>${dorm.address || 'Не указано'}</td>
             <td>
                 <button class="delete-button" data-dorm-id="${dorm.id}">Удалить</button>
             </td>
@@ -140,8 +140,8 @@ function populateMachinesTable(machines) {
         row.innerHTML = `
             <td>${machine.id}</td>
             <td>${machine.name}</td>
-            <td>${machine.type === 1 ? 'Стиральная Машинка (WASHER)' : 'Сушильная Машинка (DRYER)'}</td>
-            <td>${machine.dormitoryName || 'Не указано'}</td>
+            <td>${machine.locationName}</td>
+            <td>${machine.coworkingType || 'Не указано'}</td>
             <td>
                 <button class="delete-button" data-machine-id="${machine.id}">Удалить</button>
             </td>
