@@ -1,6 +1,6 @@
 package com.mai.db_cw.machines;
 
-import com.mai.db_cw.infrastructure.operation_storage.OperationStorage;
+import com.mai.db_cw.config.infrastructure.operation_storage.OperationStorage;
 import com.mai.db_cw.machines.dto.MachineRequest;
 import com.mai.db_cw.machines.dto.MachineResponse;
 import lombok.RequiredArgsConstructor;
@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.UUID;
 
-import static com.mai.db_cw.infrastructure.utility.OperationUtility.responseEntityDependsOnOperationStatus;
+import static com.mai.db_cw.config.infrastructure.utility.OperationUtility.responseEntityDependsOnOperationStatus;
 
 @RestController
 @RequestMapping("/api/machines")

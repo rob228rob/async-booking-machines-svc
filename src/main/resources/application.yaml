@@ -7,6 +7,12 @@ application:
     email: ${ADMIN_ACCOUNT_EMAIL:admin@gmail.com}
     password: ${ADMIN_ACCOUNT_PSSWD:qweqweqwe}
 
+redis:
+  host: localhost
+  port: 6380
+  username: redisuser
+  password: redisuserpassword
+
 infinispan:
   remote:
     enabled: true
@@ -22,6 +28,8 @@ infinispan:
     sasl-mechanism: ${INFINISPAN_AUTH_ALGO:SCRAM-SHA-512}
 
 spring:
+  main:
+    allow-bean-definition-overriding: true
   application:
     name: lawyer-helper
   # oauth2 config
@@ -48,21 +56,27 @@ spring:
     show-sql: false
   datasource:
     driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://localhost:5432/main_db
-    username: ${DB_USERNAME:postgres}
-    password: ${DB_PW:postgres}
+    url: jdbc:postgresql://localhost:5439/main_db
+    username: ${DB_USERNAME:usern}
+    password: ${DB_PW:password}
   batch:
     jdbc:
       initialize-schema: always
 
   liquibase:
-    enabled: false
+    enabled: true
     change-log: classpath:db/changelog/db.changelog-master.yaml
   cache:
     infinispan:
       max-count-elem: 10000
       pass: pass
       config: user
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6380}
+      username: redisuser
+      password: redisuserpassword
 
 
 server:

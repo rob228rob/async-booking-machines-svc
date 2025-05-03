@@ -1,6 +1,6 @@
 package com.mai.db_cw.dormitory;
 
-import com.mai.db_cw.infrastructure.operation_storage.OperationStorage;
+import com.mai.db_cw.config.infrastructure.operation_storage.OperationStorage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.UUID;
 
-import static com.mai.db_cw.infrastructure.utility.OperationUtility.responseEntityDependsOnOperationStatus;
+import static com.mai.db_cw.config.infrastructure.utility.OperationUtility.responseEntityDependsOnOperationStatus;
 
 @Slf4j
 @RestController

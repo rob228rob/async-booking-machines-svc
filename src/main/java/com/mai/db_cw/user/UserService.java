@@ -1,9 +1,9 @@
 package com.mai.db_cw.user;
 
 import com.fasterxml.uuid.Generators;
-import com.mai.db_cw.infrastructure.exceptions.EntityNotFoundException;
-import com.mai.db_cw.infrastructure.exceptions.UserNotFoundException;
-import com.mai.db_cw.infrastructure.exceptions.UserRoleNotFoundException;
+import com.mai.db_cw.config.infrastructure.exceptions.EntityNotFoundException;
+import com.mai.db_cw.config.infrastructure.exceptions.UserNotFoundException;
+import com.mai.db_cw.config.infrastructure.exceptions.UserRoleNotFoundException;
 import com.mai.db_cw.role.Role;
 import com.mai.db_cw.role.dao.RoleDao;
 

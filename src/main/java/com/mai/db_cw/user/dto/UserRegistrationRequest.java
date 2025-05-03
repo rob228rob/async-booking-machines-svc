@@ -1,7 +1,7 @@
 package com.mai.db_cw.user.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.mai.db_cw.infrastructure.exceptions.InvalidUserInfoException;
+import com.mai.db_cw.config.infrastructure.exceptions.InvalidUserInfoException;
 import jakarta.validation.constraints.*;
 import lombok.*;
 

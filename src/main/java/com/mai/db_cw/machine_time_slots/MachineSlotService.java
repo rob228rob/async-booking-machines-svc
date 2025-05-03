@@ -1,7 +1,7 @@
 package com.mai.db_cw.machine_time_slots;
 
 import com.mai.db_cw.dormitory.DormitoryRepository;
-import com.mai.db_cw.infrastructure.exceptions.ApplicationException;
+import com.mai.db_cw.config.infrastructure.exceptions.ApplicationException;
 import com.mai.db_cw.machine_time_slots.dto.MachineTimeSlotResponse;
 import com.mai.db_cw.machines.Machine;
 import com.mai.db_cw.machines.MachineService;

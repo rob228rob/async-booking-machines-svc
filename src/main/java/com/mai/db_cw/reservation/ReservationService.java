@@ -1,9 +1,9 @@
 package com.mai.db_cw.reservation;
 
-import com.mai.db_cw.infrastructure.exceptions.ApplicationException;
-import com.mai.db_cw.infrastructure.exceptions.EntityNotFoundException;
-import com.mai.db_cw.infrastructure.exceptions.InvalidUserInfoException;
-import com.mai.db_cw.infrastructure.operation_storage.OperationStorage;
+import com.mai.db_cw.config.infrastructure.exceptions.ApplicationException;
+import com.mai.db_cw.config.infrastructure.exceptions.EntityNotFoundException;
+import com.mai.db_cw.config.infrastructure.exceptions.InvalidUserInfoException;
+import com.mai.db_cw.config.infrastructure.operation_storage.OperationStorage;
 import com.mai.db_cw.machine_time_slots.MachineTimeSlotRepository;
 import com.mai.db_cw.machines.Machine;
 import com.mai.db_cw.machines.MachineService;

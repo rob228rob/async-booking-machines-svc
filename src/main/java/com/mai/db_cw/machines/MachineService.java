@@ -1,7 +1,7 @@
 package com.mai.db_cw.machines;
 
-import com.mai.db_cw.infrastructure.exceptions.ApplicationException;
-import com.mai.db_cw.infrastructure.operation_storage.OperationStorage;
+import com.mai.db_cw.config.infrastructure.exceptions.ApplicationException;
+import com.mai.db_cw.config.infrastructure.operation_storage.OperationStorage;
 import com.mai.db_cw.machines.dao.MachineRepository;
 import com.mai.db_cw.machines.dto.MachineRequest;
 import com.mai.db_cw.machines.dto.MachineResponse;
@@ -14,7 +14,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.*;
 
-import static com.mai.db_cw.infrastructure.utility.ExceptionUtility.throwIfAnyObjectIsNull;
+import static com.mai.db_cw.config.infrastructure.utility.ExceptionUtility.throwIfAnyObjectIsNull;
 
 @Slf4j
 @Service
