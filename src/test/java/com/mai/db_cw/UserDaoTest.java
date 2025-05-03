@@ -6,9 +6,9 @@ import static org.junit.jupiter.api.Assertions.*;
 import java.time.LocalDateTime;
 import java.util.*;
 
-import com.mai.db_cw.user.dao.UserDao;
-import com.mai.db_cw.user.dao.UserDaoImpl;
-import com.mai.db_cw.user.User;
+import com.mai.db_cw.rest.user.dao.UserDao;
+import com.mai.db_cw.rest.user.dao.UserDaoImpl;
+import com.mai.db_cw.rest.user.User;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.*;
