@@ -7,11 +7,46 @@ application:
     email: ${ADMIN_ACCOUNT_EMAIL:admin@gmail.com}
     password: ${ADMIN_ACCOUNT_PSSWD:qweqweqwe}
 
+redis:
+  host: localhost
+  port: 6380
+  username: redisuser
+  password: redisuserpassword
+
+infinispan:
+  remote:
+    enabled: true
+    socketTimeout: 20000
+    connectTimeout: 10000
+    maxRetries: 3
+  server:
+    host: ${INFINISPAN_SERVER_HOST:data-grid-infinispan}
+    port: ${INFINISPAN_SERVER_PORT:11222}
+  auth:
+    user: ${INFINISPAN_USER:admin}
+    pass: ${INFINISPAN_PASS:password}
+    sasl-mechanism: ${INFINISPAN_AUTH_ALGO:SCRAM-SHA-512}
 
 spring:
+  main:
+    allow-bean-definition-overriding: true
   application:
     name: lawyer-helper
-
+  # oauth2 config
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: ${GOOGLE_CLIENT_ID:194117919596-6ih07n2bil0ttbvdu6ruk4tb1q3li9dk.apps.googleusercontent.com}
+            client-secret: ${GOOGLE_CLIENT_SECRET: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}
+        provider:
+          google:
+            authorization-uri: https://accounts.google.com/o/oauth2/v2/auth
+            token-uri: https://oauth2.googleapis.com/token
+            user-info-uri: https://www.googleapis.com/oauth2/v3/userinfo
+            jwk-set-uri: https://www.googleapis.com/oauth2/v3/certs
+            user-name-attribute: sub
   jpa:
     properties:
       hibernate:
@@ -19,13 +54,11 @@ spring:
         format_sql: true
         use_sql_comments: true
     show-sql: false
-
   datasource:
     driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://localhost:5432/main_db
-    username: ${DB_USERNAME:postgres}
-    password: ${DB_PW:postgres}
-
+    url: jdbc:postgresql://localhost:5439/main_db
+    username: ${DB_USERNAME:usern}
+    password: ${DB_PW:password}
   batch:
     jdbc:
       initialize-schema: always
@@ -33,6 +66,18 @@ spring:
   liquibase:
     enabled: true
     change-log: classpath:db/changelog/db.changelog-master.yaml
+  cache:
+    infinispan:
+      max-count-elem: 10000
+      pass: pass
+      config: user
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6380}
+      username: redisuser
+      password: redisuserpassword
+
 
 server:
   port: 8081

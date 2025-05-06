@@ -1,29 +1,100 @@
 services:
-  db-cw-app:
-    build: .
-    ports:
-      - "8081:8081"
-    depends_on:
-      - main_db
-    environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://main_db:5432/main_db
-      SPRING_DATASOURCE_USERNAME: ${MAIN_DB_USERNAME:-postgres}
-      SPRING_DATASOURCE_PASSWORD: ${MAIN_DB_PASSWD:-postgres}
-    networks:
-      - my_network
+#  db-cw-app:
+#    build: .
+#    ports:
+#      - "8081:8081"
+#    depends_on:
+#      main_db:
+#        condition: service_healthy
+#      data-grid-infinispan:
+#        condition: service_healthy
+#    environment:
+#      INFINISPAN_SERVER_URL: data-grid-infinispan:11222
+#      INFINISPAN_USER: ${USER_INFINISPAN:-admin}
+#      INFINISPAN_PASS: ${PASS_INFINISPAN:-password}
+#      SPRING_DATASOURCE_URL: jdbc:postgresql://main_db:5432/main_db
+#      SPRING_DATASOURCE_USERNAME: ${MAIN_DB_USERNAME:-postgres}
+#      SPRING_DATASOURCE_PASSWORD: ${MAIN_DB_PASSWD:-postgres}
+#    networks:
+#      - my_network
 
   main_db:
     image: postgres:latest
     environment:
       POSTGRES_DB: main_db
-      POSTGRES_USER: ${MAIN_DB_USERNAME:-postgres}
-      POSTGRES_PASSWORD: ${MAIN_DB_PASSWD:-postgres}
+      POSTGRES_USER: ${MAIN_DB_USERNAME:-usern}
+      POSTGRES_PASSWORD: ${MAIN_DB_PASSWD:-password}
     ports:
-      - "5432:5432"
+      - "5439:5432"
     networks:
       - my_network
     volumes:
       - pg_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U usern"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:latest
+    container_name: redis_container
+    environment:
+      - REDIS_PASSWORD=redispassword
+      - REDIS_USER=redisuser
+      - REDIS_USER_PASSWORD=redisuserpassword
+    ports:
+      - "6380:6379"
+    volumes:
+      - redis-data:/data
+    deploy:
+      resources:
+        limits:
+          cpus: '0.50'
+          memory: 512M
+        reservations:
+          cpus: '0.25'
+          memory: 256M
+    command: >
+      sh -c '
+        mkdir -p /usr/local/etc/redis &&
+        echo "bind 0.0.0.0" > /usr/local/etc/redis/redis.conf &&
+        echo "requirepass redispassword" >> /usr/local/etc/redis/redis.conf &&
+        echo "appendonly yes" >> /usr/local/etc/redis/redis.conf &&
+        echo "appendfsync everysec" >> /usr/local/etc/redis/redis.conf &&
+        echo "user default on nopass ~* +@all" > /usr/local/etc/redis/users.acl &&
+        echo "user redisuser on >redisuserpassword ~* +@all allchannels " >> /usr/local/etc/redis/users.acl &&
+        redis-server /usr/local/etc/redis/redis.conf --aclfile /usr/local/etc/redis/users.acl
+      '
+    healthcheck:
+      test: [ "CMD", "redis-cli", "-a", "redispassword", "ping" ]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    restart: unless-stopped
+    networks:
+      - my_network
+    tty: true
+    stdin_open: true
+
+#  data-grid-infinispan:
+#    image: infinispan/server:latest
+#    environment:
+#      USER: ${USER_INFINISPAN:-admin}
+#      PASS: ${PASS_INFINISPAN:-password}
+#      JAVA_OPTS: -Dinfinispan.configuration=file:///opt/infinispan/server/conf/infinispan.xml
+#    ports:
+#      - "11222:11222"
+#    networks:
+#      - my_network
+#    volumes:
+#      - infinispan_data:/opt/infinispan/data
+#      - ./src/main/resources/infinispan.xml:/opt/infinispan/server/conf/infinispan.xml:ro
+#    healthcheck:
+#      test: ["CMD-SHELL", "curl -f -vk https://yandex.ru"]
+#      interval: 8s
+#      timeout: 15s
+#      retries: 1
 
   redis:
     image: redis:latest
@@ -76,3 +147,5 @@ networks:
 volumes:
   pg_data:
   app_backups:
+  infinispan_data:
+  redis-data:
